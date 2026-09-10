@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diccionario de Programación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e6;
+    --paper-dark:#efe7d6;
+    --ink:#1f2937;
+    --ink-soft:#4b5361;
+    --rule:#c9bfa6;
+    --oxblood:#7a2e2e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+  header.masthead{
+    text-align:center;
+    border-bottom:3px double var(--ink);
+    padding-bottom:18px;
+    margin-bottom:22px;
+  }
+  header.masthead h1{
+    font-size:2.6rem;
+    margin:0 0 6px;
+    letter-spacing:0.3px;
+    font-weight:700;
+  }
+  header.masthead p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:1.02rem;
+    font-style:italic;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:0;
+    align-items:start;
+  }
+  nav.tabs{
+    position:sticky;
+    top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  nav.tabs button{
+    font-family:'Source Serif 4', serif;
+    text-align:left;
+    border:1px solid var(--ink);
+    border-right:none;
+    background:var(--paper-dark);
+    color:var(--ink);
+    padding:9px 12px 9px 14px;
+    font-size:0.92rem;
+    font-weight:600;
+    cursor:pointer;
+    border-radius:6px 0 0 6px;
+    position:relative;
+    transform:translateX(20px);
+    transition:transform .15s ease, background .15s ease;
+  }
+  nav.tabs button .dot{
+    display:inline-block;
+    width:8px;height:8px;
+    border-radius:50%;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+  nav.tabs button:hover{ transform:translateX(10px); }
+  nav.tabs button.active{
+    background:var(--lang-color, var(--oxblood));
+    color:#fff;
+    transform:translateX(0);
+    border-color:var(--lang-color, var(--oxblood));
+    z-index:2;
+  }
+  main.content{
+    background:#fffdf8;
+    border:1px solid var(--ink);
+    border-radius:2px;
+    padding:26px 30px 34px;
+    min-height:600px;
+    box-shadow:2px 2px 0 rgba(0,0,0,0.06);
+  }
+  .lang-heading{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    border-bottom:2px solid var(--rule);
+    padding-bottom:12px;
+    margin-bottom:16px;
+  }
+  .lang-heading h2{
+    margin:0;
+    font-size:1.6rem;
+    color:var(--lang-color, var(--oxblood));
+  }
+  .lang-heading .count{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+  .search-row{ margin-bottom:20px; }
+  .search-row input{
+    width:100%;
+    padding:11px 14px;
+    font-size:1rem;
+    font-family:'Source Serif 4', serif;
+    border:1px solid var(--ink);
+    border-radius:5px;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .search-row input:focus{
+    outline:2px solid var(--lang-color, var(--oxblood));
+    outline-offset:1px;
+  }
+  .search-row .hint{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    margin-top:6px;
+    font-style:italic;
+  }
+  .entries{ display:flex; flex-direction:column; }
+  .entry{ padding:16px 0; border-bottom:1px solid var(--rule); }
+  .entry:last-child{ border-bottom:none; }
+  .entry-head{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .entry-word{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:1.15rem;
+    color:var(--ink);
+    background:var(--paper-dark);
+    padding:1px 7px;
+    border-radius:4px;
+  }
+  .entry-cat{ font-style:italic; color:var(--lang-color, var(--oxblood)); font-size:0.87rem; }
+  .entry-def{ margin:8px 0 6px; line-height:1.55; font-size:1rem; }
+  .entry-use{ margin:0 0 10px; color:var(--ink-soft); font-size:0.95rem; line-height:1.5; }
+  .entry-use strong{ color:var(--ink); font-style:normal; }
+  pre.example{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.87rem;
+    background:#232323;
+    color:#e9e4d8;
+    padding:12px 14px;
+    border-radius:6px;
+    overflow-x:auto;
+    margin:0;
+    line-height:1.5;
+    border-left:4px solid var(--lang-color, var(--oxblood));
+  }
+  .no-results{ text-align:center; padding:60px 20px; color:var(--ink-soft); font-style:italic; }
+  mark{ background:#f0d98c; color:inherit; padding:0 1px; border-radius:2px; }
+  footer.note{ text-align:center; color:var(--ink-soft); font-size:0.85rem; margin-top:28px; font-style:italic; }
+
+  @media (max-width:760px){
+    .layout{ grid-template-columns:1fr; }
+    nav.tabs{ position:static; flex-direction:row; overflow-x:auto; gap:8px; padding-bottom:6px; margin-bottom:14px; }
+    nav.tabs button{ transform:none; border-radius:6px; border-right:1px solid var(--ink); white-space:nowrap; }
+    nav.tabs button.active{ transform:none; }
+    main.content{ padding:18px 16px 26px; }
+    header.masthead h1{ font-size:2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <h1>Diccionario de Programación</h1>
+    <p>Palabras clave, sintaxis y conceptos — qué significan, para qué sirven y cómo se usan</p>
+  </header>
+
+  <div class="layout">
+    <nav class="tabs" id="tabs"></nav>
+    <main class="content">
+      <div class="lang-heading">
+        <h2 id="langTitle"></h2>
+        <span class="count" id="langCount"></span>
+      </div>
+      <div class="search-row">
+        <input type="text" id="searchBox" placeholder="Buscar una palabra o concepto en este lenguaje…" autocomplete="off">
+        <div class="hint">Cambia de lenguaje en la pestaña izquierda para buscar con más precisión — cada lenguaje tiene su propio significado para palabras como "static", "class" o "char".</div>
+      </div>
+      <div class="entries" id="entries"></div>
+    </main>
+  </div>
+
+  <footer class="note">Hecho para quienes están empezando a programar — usa la búsqueda, cambia de lenguaje y explora.</footer>
+</div>
+
+<script>
+const DATA = {
+  js: { name:"JavaScript", color:"#7a2e2e", words:[
+    {w:"var",cat:"declaración de variable",def:"Declara una variable cuyo alcance es toda la función donde se crea (no el bloque). Es la forma más antigua de declarar variables.",use:"Se usa poco hoy porque let y const evitan errores comunes al respetar el alcance de bloque.",ex:"var edad = 20;\nconsole.log(edad); // 20"},
+    {w:"let",cat:"declaración de variable",def:"Declara una variable con alcance de bloque (solo existe dentro de las llaves { } donde se creó) y cuyo valor puede cambiar.",use:"Es la forma recomendada de declarar variables que sí van a cambiar de valor.",ex:"let contador = 0;\ncontador = contador + 1;"},
+    {w:"const",cat:"declaración de variable",def:"Declara una variable de alcance de bloque cuyo valor no puede reasignarse una vez definido.",use:"Se usa para valores que no deben cambiar, como configuraciones o referencias fijas.",ex:"const PI = 3.1416;"},
+    {w:"function",cat:"declaración",def:"Define un bloque de código reutilizable que puede recibir parámetros y devolver un resultado.",use:"Sirve para organizar el código en piezas reutilizables en lugar de repetirlo.",ex:"function saludar(nombre) {\n  return 'Hola, ' + nombre;\n}"},
+    {w:"return",cat:"instrucción",def:"Termina la ejecución de una función y opcionalmente entrega un valor de vuelta.",use:"Se usa para enviar un resultado desde una función hacia afuera.",ex:"function doble(n) {\n  return n * 2;\n}"},
+    {w:"if",cat:"control de flujo",def:"Ejecuta un bloque de código solo si una condición es verdadera.",use:"Sirve para tomar decisiones dentro del programa según una condición.",ex:"if (edad >= 18) {\n  console.log('Mayor de edad');\n}"},
+    {w:"else",cat:"control de flujo",def:"Define el bloque alternativo que se ejecuta cuando la condición de un if es falsa.",use:"Se usa junto a if para cubrir el caso contrario.",ex:"if (edad >= 18) {\n  console.log('Mayor');\n} else {\n  console.log('Menor');\n}"},
+    {w:"for",cat:"control de flujo",def:"Repite un bloque de código un número determinado de veces, controlado por un contador.",use:"Se usa para recorrer listas o repetir una acción un número fijo de veces.",ex:"for (let i = 0; i < 3; i++) {\n  console.log(i);\n}"},
+    {w:"for...of",cat:"control de flujo",def:"Recorre uno por uno los elementos de una colección iterable, como un arreglo o una cadena.",use:"Se usa para recorrer los valores de un arreglo sin manejar índices manualmente.",ex:"for (const fruta of ['manzana','pera']) {\n  console.log(fruta);\n}"},
+    {w:"for...in",cat:"control de flujo",def:"Recorre las claves (nombres de propiedades) de un objeto.",use:"Se usa para recorrer las propiedades de un objeto.",ex:"const p = {a:1, b:2};\nfor (const clave in p) {\n  console.log(clave);\n}"},
+    {w:"while",cat:"control de flujo",def:"Repite un bloque de código mientras una condición se siga cumpliendo.",use:"Se usa cuando no se sabe de antemano cuántas veces se repetirá el ciclo.",ex:"let n = 0;\nwhile (n < 3) {\n  console.log(n);\n  n++;\n}"},
+    {w:"do...while",cat:"control de flujo",def:"Como while, pero garantiza que el bloque se ejecute al menos una vez antes de revisar la condición.",use:"Se usa cuando la acción debe ocurrir mínimo una vez, como pedir datos al usuario.",ex:"let n = 0;\ndo {\n  console.log(n);\n  n++;\n} while (n < 3);"},
+    {w:"switch",cat:"control de flujo",def:"Compara un valor contra varias opciones (case) y ejecuta el bloque que coincida.",use:"Sirve como alternativa más clara a muchos if/else encadenados.",ex:"switch (dia) {\n  case 1: console.log('Lunes'); break;\n  default: console.log('Otro');\n}"},
+    {w:"break",cat:"instrucción",def:"Detiene inmediatamente un ciclo o un switch, saliendo de él.",use:"Se usa para terminar un ciclo antes de que termine por sí solo.",ex:"for (let i=0;i<10;i++){\n  if (i===3) break;\n}"},
+    {w:"continue",cat:"instrucción",def:"Salta a la siguiente vuelta de un ciclo, sin ejecutar el resto del bloque actual.",use:"Se usa para omitir casos específicos dentro de un ciclo.",ex:"for (let i=0;i<5;i++){\n  if (i%2===0) continue;\n  console.log(i);\n}"},
+    {w:"class",cat:"programación orientada a objetos",def:"Define una plantilla para crear objetos con propiedades y métodos en común.",use:"Se usa para modelar entidades del mundo real, como Usuario o Producto.",ex:"class Perro {\n  constructor(nombre){ this.nombre = nombre; }\n}"},
+    {w:"extends",cat:"programación orientada a objetos",def:"Permite que una clase herede propiedades y métodos de otra clase.",use:"Se usa para reutilizar comportamiento común entre clases parecidas.",ex:"class Cachorro extends Perro { }"},
+    {w:"super",cat:"palabra especial",def:"Hace referencia a la clase padre; permite llamar su constructor o sus métodos.",use:"Se usa dentro de una subclase para reutilizar comportamiento heredado.",ex:"class Cachorro extends Perro {\n  constructor(n){ super(n); }\n}"},
+    {w:"this",cat:"palabra especial",def:"Hace referencia al objeto actual dentro del cual se está ejecutando el código.",use:"Se usa dentro de métodos para acceder a las propiedades del propio objeto.",ex:"class Persona {\n  constructor(n){ this.nombre = n; }\n}"},
+    {w:"new",cat:"operador",def:"Crea una nueva instancia (un nuevo objeto) a partir de una clase.",use:"Se usa cada vez que se necesita un objeto nuevo basado en una clase.",ex:"const miPerro = new Perro('Firulais');"},
+    {w:"static",cat:"modificador",def:"Define un método o propiedad que pertenece a la clase en sí, no a cada objeto creado.",use:"Se usa para funciones de utilidad compartidas, como métodos de fábrica.",ex:"class Util {\n  static sumar(a,b){ return a+b; }\n}\nUtil.sumar(2,3);"},
+    {w:"get / set",cat:"programación orientada a objetos",def:"Definen métodos especiales que se comportan como si fueran propiedades al leer (get) o escribir (set) un valor.",use:"Se usan para controlar el acceso a una propiedad, validando o calculando su valor.",ex:"class Circulo {\n  get area(){ return this.r*this.r*3.14; }\n}"},
+    {w:"try",cat:"manejo de errores",def:"Marca un bloque de código que podría fallar, para poder capturar el error si ocurre.",use:"Se usa para manejar errores de forma controlada.",ex:"try {\n  JSON.parse('no es JSON');\n} catch (e) { }"},
+    {w:"catch",cat:"manejo de errores",def:"Captura y maneja un error que ocurrió dentro de un bloque try.",use:"Se usa para responder ante un fallo sin que el programa se detenga.",ex:"try { }\ncatch (error) {\n  console.log(error.message);\n}"},
+    {w:"finally",cat:"manejo de errores",def:"Define un bloque que se ejecuta siempre, haya ocurrido un error o no.",use:"Se usa para tareas de limpieza, como cerrar una conexión.",ex:"try { }\ncatch (e) { }\nfinally { console.log('Terminado'); }"},
+    {w:"throw",cat:"manejo de errores",def:"Genera (lanza) un error de forma manual dentro del código.",use:"Se usa para señalar que algo salió mal en un punto específico.",ex:"if (edad < 0) {\n  throw new Error('Edad inválida');\n}"},
+    {w:"typeof",cat:"operador",def:"Devuelve el tipo de dato de un valor, como 'string', 'number' o 'boolean'.",use:"Se usa para comprobar qué tipo de dato se está manejando.",ex:"console.log(typeof 5); // 'number'"},
+    {w:"instanceof",cat:"operador",def:"Comprueba si un objeto fue creado a partir de una clase determinada.",use:"Se usa para verificar el tipo de un objeto antes de operar con él.",ex:"console.log(miPerro instanceof Perro); // true"},
+    {w:"in",cat:"operador",def:"Comprueba si una propiedad existe dentro de un objeto.",use:"Se usa para verificar la existencia de una clave antes de usarla.",ex:"console.log('nombre' in persona);"},
+    {w:"of",cat:"palabra reservada",def:"Se usa junto con for para indicar que se recorrerán los valores de una colección.",use:"Forma parte de la sintaxis de for...of.",ex:"for (const x of [1,2,3]) { }"},
+    {w:"null",cat:"valor especial",def:"Representa la ausencia intencional de un valor, asignada explícitamente por quien programa.",use:"Se usa para indicar que una variable existe pero deliberadamente no tiene valor.",ex:"let usuario = null;"},
+    {w:"undefined",cat:"valor especial",def:"Es el valor automático de una variable que fue declarada pero nunca recibió un valor.",use:"Aparece cuando algo no se ha definido, a diferencia de null que se asigna a propósito.",ex:"let x;\nconsole.log(x); // undefined"},
+    {w:"true / false",cat:"tipo de dato (boolean)",def:"Los dos únicos valores del tipo booleano, verdadero y falso.",use:"Se usan en condiciones y comparaciones lógicas.",ex:"let activo = true;"},
+    {w:"async",cat:"asincronía",def:"Marca una función como asíncrona, permitiendo usar await dentro de ella.",use:"Se usa para trabajar con operaciones que toman tiempo, como peticiones de red.",ex:"async function obtener(){ }"},
+    {w:"await",cat:"asincronía",def:"Pausa la ejecución de una función async hasta que una promesa se resuelva.",use:"Se usa para esperar un resultado sin bloquear el resto del programa.",ex:"const datos = await fetch(url);"},
+    {w:"yield",cat:"palabra especial",def:"Pausa una función generadora y devuelve un valor, pudiendo reanudarse después.",use:"Se usa dentro de generadores para producir valores uno a la vez.",ex:"function* contar(){ yield 1; yield 2; }"},
+    {w:"import",cat:"módulos",def:"Trae código exportado desde otro archivo al archivo actual.",use:"Se usa para dividir un proyecto grande en varios archivos organizados.",ex:"import { saludar } from './archivo.js';"},
+    {w:"export",cat:"módulos",def:"Hace público un valor, función o clase para que otros archivos puedan importarlo.",use:"Se usa para compartir código entre archivos.",ex:"export function saludar(){ }"},
+    {w:"delete",cat:"operador",def:"Elimina una propiedad de un objeto.",use:"Se usa cuando ya no se necesita una propiedad específica.",ex:"delete persona.edad;"},
+    {w:"void",cat:"operador",def:"Evalúa una expresión y devuelve siempre undefined, sin usar su resultado.",use:"Es poco común hoy; históricamente se usaba en enlaces javascript:void(0).",ex:"void 0; // undefined"},
+    {w:"Promise",cat:"asincronía",def:"Un objeto que representa un valor que estará disponible en el futuro, con éxito o error.",use:"Se usa para manejar tareas asíncronas como descargas o temporizadores.",ex:"new Promise((resolve) => resolve('Listo'));"},
+    {w:"Array",cat:"tipo de dato",def:"Una lista ordenada de valores, accesibles por índice numérico.",use:"Se usa para guardar varios valores relacionados en una sola variable.",ex:"const colores = ['rojo','azul'];"},
+    {w:"Object",cat:"tipo de dato",def:"Una colección de pares clave-valor que agrupa datos relacionados con nombres descriptivos.",use:"Se usa para representar entidades con varias propiedades.",ex:"const persona = { nombre:'Luis' };"},
+    {w:"String",cat:"tipo de dato",def:"Representa una cadena de texto.",use:"Se usa para almacenar y manipular texto.",ex:"let nombre = 'Ana';"},
+    {w:"Number",cat:"tipo de dato",def:"Representa un valor numérico, entero o decimal.",use:"Se usa para cálculos matemáticos y conteos.",ex:"let edad = 20;"},
+    {w:"=== / !==",cat:"operador",def:"Comparan igualdad o desigualdad estricta, sin convertir tipos automáticamente.",use:"Se recomienda usarlos siempre en vez de == para evitar comparaciones inesperadas.",ex:"5 === '5'; // false"},
+    {w:"&& / || / !",cat:"operador lógico",def:"&& (y lógico), || (o lógico), ! (negación) — combinan o invierten condiciones booleanas.",use:"Se usan para construir condiciones más complejas.",ex:"if (edad >= 18 && activo) { }"},
+    {w:"?? (nullish coalescing)",cat:"operador",def:"Devuelve el valor de la derecha solo si el de la izquierda es null o undefined.",use:"Se usa para asignar valores por defecto de forma segura.",ex:"let nombre = entrada ?? 'Invitado';"},
+    {w:"?. (optional chaining)",cat:"operador",def:"Accede a una propiedad de un objeto sin lanzar error si el objeto es null o undefined.",use:"Se usa para evitar errores al acceder a propiedades anidadas que podrían no existir.",ex:"console.log(usuario?.direccion?.ciudad);"},
+    {w:"spread (...)",cat:"operador",def:"Expande los elementos de un arreglo u objeto en lugares donde se esperan varios valores.",use:"Se usa para copiar o combinar arreglos y objetos.",ex:"const b = [...[1,2], 3];"},
+    {w:"template literal (`...`)",cat:"sintaxis",def:"Cadenas de texto que permiten insertar variables directamente con ${ }.",use:"Se usa para construir textos combinando variables sin concatenar con +.",ex:"`Hola, ${nombre}!`"},
+    {w:"arrow function (=>)",cat:"sintaxis",def:"Una forma corta de escribir funciones, útil para funciones pequeñas.",use:"Se usa mucho en callbacks por su sintaxis compacta.",ex:"const doble = (n) => n * 2;"},
+    {w:"map()",cat:"método de arreglo",def:"Crea un nuevo arreglo aplicando una función a cada elemento del original.",use:"Se usa para transformar todos los elementos de una lista.",ex:"[1,2,3].map(n => n*2); // [2,4,6]"},
+    {w:"filter()",cat:"método de arreglo",def:"Crea un nuevo arreglo con solo los elementos que cumplen una condición.",use:"Se usa para quedarse únicamente con los datos que interesan.",ex:"[1,2,3,4].filter(n => n%2===0); // [2,4]"},
+    {w:"reduce()",cat:"método de arreglo",def:"Combina todos los elementos de un arreglo en un solo valor acumulado.",use:"Se usa para sumar, contar o construir un resultado a partir de una lista.",ex:"[1,2,3].reduce((a,b)=>a+b,0); // 6"},
+    {w:"console.log()",cat:"función",def:"Muestra información en la consola del navegador o de Node.js.",use:"Se usa constantemente para depurar y revisar valores durante el desarrollo.",ex:"console.log('Hola mundo');"},
+    {w:"NaN",cat:"valor especial",def:"Significa 'Not a Number'; representa el resultado de una operación numérica inválida.",use:"Se usa para detectar cuando un cálculo no produjo un número válido.",ex:"console.log(0/'a'); // NaN"},
+    {w:"Infinity",cat:"valor especial",def:"Representa un valor numérico infinito, positivo o negativo.",use:"Aparece al dividir un número entre cero o en cálculos que exceden el límite numérico.",ex:"console.log(1/0); // Infinity"},
+    {w:"parseInt() / parseFloat()",cat:"función",def:"Convierten una cadena de texto en un número entero o decimal respectivamente.",use:"Se usan para transformar texto (por ejemplo de un input) en un número utilizable.",ex:"parseInt('20'); // 20\nparseFloat('9.99'); // 9.99"},
+    {w:"Math",cat:"objeto integrado",def:"Un objeto con propiedades y métodos matemáticos, como redondeo, potencias o números aleatorios.",use:"Se usa para cálculos matemáticos comunes sin escribirlos manualmente.",ex:"Math.random();\nMath.floor(4.7); // 4"},
+    {w:"Date",cat:"objeto integrado",def:"Representa una fecha y hora específica.",use:"Se usa para trabajar con fechas, calcular diferencias de tiempo o mostrar la fecha actual.",ex:"const hoy = new Date();"},
+    {w:"JSON.stringify() / JSON.parse()",cat:"función",def:"stringify convierte un objeto de JavaScript en texto JSON; parse hace lo contrario.",use:"Se usan para guardar datos como texto o para leer datos que llegan en formato JSON.",ex:"JSON.stringify({a:1}); // '{\"a\":1}'"},
+    {w:"localStorage",cat:"API del navegador",def:"Permite guardar datos de forma permanente en el navegador del usuario, incluso al cerrar la pestaña.",use:"Se usa para recordar preferencias o datos entre visitas sin un servidor.",ex:"localStorage.setItem('tema', 'oscuro');"},
+    {w:"addEventListener()",cat:"método del DOM",def:"Registra una función que se ejecutará cuando ocurra un evento, como un clic.",use:"Se usa para hacer que la página reaccione a las acciones del usuario.",ex:"boton.addEventListener('click', () => alert('Hola'));"},
+    {w:"document.querySelector()",cat:"método del DOM",def:"Busca y devuelve el primer elemento del HTML que coincide con un selector CSS.",use:"Se usa para seleccionar elementos del HTML y manipularlos con JavaScript.",ex:"const btn = document.querySelector('.mi-boton');"},
+    {w:"setTimeout() / setInterval()",cat:"función",def:"setTimeout ejecuta código una vez después de un tiempo; setInterval lo repite indefinidamente cada cierto tiempo.",use:"Se usan para retrasar acciones o repetirlas periódicamente.",ex:"setTimeout(() => console.log('Listo'), 1000);"},
+    {w:"Array.isArray()",cat:"método",def:"Comprueba si un valor es realmente un arreglo.",use:"Se usa para validar datos antes de usar métodos de arreglo sobre ellos.",ex:"Array.isArray([1,2,3]); // true"},
+    {w:"sort()",cat:"método de arreglo",def:"Ordena los elementos de un arreglo, modificando el arreglo original.",use:"Se usa para ordenar listas alfabética o numéricamente.",ex:"[3,1,2].sort(); // [1,2,3]"},
+    {w:"find()",cat:"método de arreglo",def:"Devuelve el primer elemento de un arreglo que cumple una condición.",use:"Se usa para buscar un elemento específico dentro de una lista.",ex:"[1,2,3].find(n => n > 1); // 2"},
+    {w:"includes()",cat:"método",def:"Comprueba si un arreglo o cadena contiene un valor determinado.",use:"Se usa para verificar la presencia de un elemento o subcadena.",ex:"'Hola'.includes('ol'); // true"},
+    {w:"push() / pop()",cat:"método de arreglo",def:"push agrega un elemento al final de un arreglo; pop elimina y devuelve el último elemento.",use:"Se usan para agregar o quitar elementos del final de una lista.",ex:"const a=[1,2];\na.push(3); // [1,2,3]"},
+    {w:"slice() / splice()",cat:"método de arreglo",def:"slice extrae una parte del arreglo sin modificarlo; splice modifica el arreglo original agregando o quitando elementos.",use:"Se usan para obtener o editar porciones de una lista.",ex:"[1,2,3,4].slice(1,3); // [2,3]"},
+    {w:"Object.keys() / Object.values()",cat:"método",def:"Devuelven un arreglo con las claves o los valores de un objeto respectivamente.",use:"Se usan para recorrer o inspeccionar el contenido de un objeto.",ex:"Object.keys({a:1,b:2}); // ['a','b']"},
+    {w:"Set",cat:"estructura de datos",def:"Una colección de valores únicos, sin elementos repetidos.",use:"Se usa para eliminar duplicados o comprobar pertenencia rápidamente.",ex:"const s = new Set([1,1,2]); // {1,2}"},
+    {w:"Map",cat:"estructura de datos",def:"Una colección de pares clave-valor donde las claves pueden ser de cualquier tipo.",use:"Se usa como alternativa a los objetos cuando las claves no son solo texto.",ex:"const m = new Map();\nm.set('a', 1);"},
+    {w:"closures",cat:"concepto",def:"Una función que recuerda las variables del entorno donde fue creada, incluso después de que ese entorno terminó.",use:"Se usa para crear funciones con estado privado o fábricas de funciones.",ex:"function contador(){\n  let n = 0;\n  return () => ++n;\n}"},
+    {w:"'use strict'",cat:"directiva",def:"Activa un modo más estricto de JavaScript que detecta errores comunes y evita comportamientos inseguros.",use:"Se usa al inicio de un archivo o función para escribir código más seguro.",ex:"'use strict';\nx = 5; // Error: x no declarada"}
+  ]},
+
+  py: { name:"Python", color:"#2e5a4a", words:[
+    {w:"def",cat:"declaración",def:"Define una función: un bloque de código reutilizable que puede recibir parámetros y devolver un resultado.",use:"Se usa para organizar el código en piezas reutilizables.",ex:"def saludar(nombre):\n    return f'Hola, {nombre}'"},
+    {w:"return",cat:"instrucción",def:"Termina una función y opcionalmente devuelve un valor.",use:"Se usa para entregar un resultado calculado dentro de la función.",ex:"def doble(n):\n    return n * 2"},
+    {w:"if",cat:"control de flujo",def:"Ejecuta un bloque de código solo si una condición es verdadera.",use:"Sirve para tomar decisiones dentro del programa.",ex:"if edad >= 18:\n    print('Mayor de edad')"},
+    {w:"elif",cat:"control de flujo",def:"Comprueba una condición adicional cuando la anterior (if) fue falsa.",use:"Se usa para encadenar varias condiciones distintas.",ex:"if nota >= 9:\n    print('Excelente')\nelif nota >= 6:\n    print('Aprobado')"},
+    {w:"else",cat:"control de flujo",def:"Define el bloque que se ejecuta cuando ninguna condición anterior se cumplió.",use:"Se usa para cubrir el caso restante.",ex:"if edad >= 18:\n    print('Mayor')\nelse:\n    print('Menor')"},
+    {w:"for",cat:"control de flujo",def:"Recorre los elementos de una secuencia (lista, texto, rango, etc.) uno por uno.",use:"Se usa para repetir una acción por cada elemento de una colección.",ex:"for i in range(3):\n    print(i)"},
+    {w:"while",cat:"control de flujo",def:"Repite un bloque de código mientras una condición siga siendo verdadera.",use:"Se usa cuando no se sabe de antemano cuántas repeticiones habrá.",ex:"n = 0\nwhile n < 3:\n    n += 1"},
+    {w:"break",cat:"instrucción",def:"Detiene inmediatamente un ciclo for o while.",use:"Se usa para terminar un ciclo antes de que llegue a su fin natural.",ex:"for i in range(10):\n    if i == 3:\n        break"},
+    {w:"continue",cat:"instrucción",def:"Salta directamente a la siguiente vuelta del ciclo actual.",use:"Se usa para omitir ciertos casos dentro de un ciclo sin detenerlo.",ex:"for i in range(5):\n    if i % 2 == 0:\n        continue\n    print(i)"},
+    {w:"pass",cat:"instrucción",def:"No hace absolutamente nada; es un marcador de lugar sintáctico.",use:"Se usa cuando el lenguaje exige un bloque de código pero aún no se ha escrito.",ex:"def por_hacer():\n    pass"},
+    {w:"class",cat:"programación orientada a objetos",def:"Define una plantilla para crear objetos con atributos y comportamientos comunes.",use:"Se usa para modelar entidades del mundo real.",ex:"class Perro:\n    pass"},
+    {w:"self",cat:"palabra especial",def:"Hace referencia a la instancia actual del objeto dentro de un método de una clase.",use:"Se usa para acceder a los atributos y métodos propios del objeto.",ex:"class Perro:\n    def ladrar(self):\n        return 'guau'"},
+    {w:"__init__",cat:"método especial",def:"Es el método constructor: se ejecuta automáticamente al crear un nuevo objeto.",use:"Se usa para inicializar los atributos de un objeto recién creado.",ex:"class Persona:\n    def __init__(self, nombre):\n        self.nombre = nombre"},
+    {w:"try",cat:"manejo de errores",def:"Marca un bloque de código que podría fallar.",use:"Se usa para manejar errores sin detener el programa.",ex:"try:\n    x = 10/0\nexcept:\n    pass"},
+    {w:"except",cat:"manejo de errores",def:"Captura y maneja un error ocurrido dentro de un bloque try.",use:"Se usa para responder ante un tipo de error específico.",ex:"try:\n    10/0\nexcept ZeroDivisionError:\n    print('Error')"},
+    {w:"finally",cat:"manejo de errores",def:"Define un bloque que se ejecuta siempre, haya error o no.",use:"Se usa para tareas de limpieza, como cerrar un archivo.",ex:"try:\n    pass\nfinally:\n    print('Fin')"},
+    {w:"raise",cat:"manejo de errores",def:"Genera (lanza) un error de forma manual en el código.",use:"Se usa para señalar explícitamente que algo salió mal.",ex:"raise ValueError('Edad inválida')"},
+    {w:"import",cat:"módulos",def:"Trae código de otros archivos o bibliotecas al archivo actual.",use:"Se usa para reutilizar funciones y clases ya escritas.",ex:"import math"},
+    {w:"from",cat:"módulos",def:"Indica desde qué módulo se va a importar algo específico.",use:"Se usa junto con import para traer solo una parte de un módulo.",ex:"from math import sqrt"},
+    {w:"as",cat:"módulos",def:"Asigna un alias (nombre alternativo) a algo importado.",use:"Se usa para acortar nombres largos de bibliotecas.",ex:"import numpy as np"},
+    {w:"with",cat:"instrucción",def:"Abre un recurso y garantiza que se cierre correctamente al terminar, aunque ocurra un error.",use:"Se usa comúnmente para trabajar con archivos de forma segura.",ex:"with open('datos.txt') as f:\n    contenido = f.read()"},
+    {w:"lambda",cat:"sintaxis",def:"Crea una función anónima de una sola línea.",use:"Se usa para funciones muy cortas que se necesitan solo una vez.",ex:"doble = lambda n: n * 2"},
+    {w:"yield",cat:"palabra especial",def:"Convierte una función en un generador, que produce valores uno a la vez.",use:"Se usa para trabajar con secuencias grandes sin consumir mucha memoria.",ex:"def contar():\n    for i in range(3):\n        yield i"},
+    {w:"async / await",cat:"asincronía",def:"Permiten definir y esperar funciones asíncronas.",use:"Se usa para operaciones que tardan, como peticiones de red.",ex:"async def obtener():\n    datos = await consultar()"},
+    {w:"None",cat:"valor especial",def:"Representa la ausencia de valor.",use:"Se usa para indicar que una variable no tiene un valor asignado.",ex:"usuario = None"},
+    {w:"True / False",cat:"tipo de dato (bool)",def:"Los dos únicos valores del tipo booleano.",use:"Se usan en condiciones y comparaciones lógicas.",ex:"activo = True"},
+    {w:"and",cat:"operador lógico",def:"Devuelve verdadero solo si ambas condiciones son verdaderas.",use:"Se usa para combinar condiciones.",ex:"if edad >= 18 and activo:\n    pass"},
+    {w:"or",cat:"operador lógico",def:"Devuelve verdadero si al menos una de las condiciones es verdadera.",use:"Se usa para combinar condiciones alternativas.",ex:"if es_admin or es_dueno:\n    pass"},
+    {w:"not",cat:"operador lógico",def:"Invierte el valor de una condición booleana.",use:"Se usa para negar una condición.",ex:"if not activo:\n    print('Inactivo')"},
+    {w:"in",cat:"operador",def:"Comprueba si un valor existe dentro de una colección.",use:"Se usa para verificar pertenencia sin un ciclo manual.",ex:"'pera' in ['manzana','pera']"},
+    {w:"is",cat:"operador",def:"Compara si dos variables son exactamente el mismo objeto en memoria.",use:"Se usa típicamente para comparar con None.",ex:"if x is None:\n    pass"},
+    {w:"global",cat:"palabra especial",def:"Permite modificar dentro de una función una variable definida fuera de ella.",use:"Se usa cuando una función necesita cambiar una variable global.",ex:"contador = 0\ndef sumar():\n    global contador\n    contador += 1"},
+    {w:"nonlocal",cat:"palabra especial",def:"Permite modificar una variable de una función externa desde una función anidada.",use:"Se usa en funciones dentro de funciones (closures).",ex:"def externa():\n    x = 0\n    def interna():\n        nonlocal x\n        x += 1"},
+    {w:"del",cat:"instrucción",def:"Elimina una variable, un elemento de una lista o una clave de un diccionario.",use:"Se usa para liberar o quitar datos que ya no se necesitan.",ex:"lista = [1,2,3]\ndel lista[0]"},
+    {w:"assert",cat:"instrucción",def:"Comprueba que una condición sea verdadera; si no lo es, detiene el programa con un error.",use:"Se usa para verificar suposiciones durante el desarrollo y las pruebas.",ex:"assert edad > 0, 'La edad debe ser positiva'"},
+    {w:"list",cat:"tipo de dato",def:"Una colección ordenada y modificable de elementos.",use:"Se usa para guardar varios valores relacionados en una sola variable.",ex:"colores = ['rojo','azul']"},
+    {w:"dict",cat:"tipo de dato",def:"Una colección de pares clave-valor.",use:"Se usa para representar datos con nombres descriptivos.",ex:"persona = {'nombre':'Luis'}"},
+    {w:"tuple",cat:"tipo de dato",def:"Una colección ordenada de elementos que no puede modificarse después de creada.",use:"Se usa para agrupar valores fijos que no deben cambiar.",ex:"punto = (3, 4)"},
+    {w:"set",cat:"tipo de dato",def:"Una colección desordenada de elementos únicos, sin duplicados.",use:"Se usa cuando importa la pertenencia y no el orden, evitando repetidos.",ex:"numeros = {1, 2, 3}"},
+    {w:"str",cat:"tipo de dato",def:"Representa una cadena de texto.",use:"Se usa para almacenar y manipular texto.",ex:"nombre = 'Ana'"},
+    {w:"int",cat:"tipo de dato",def:"Representa un número entero.",use:"Se usa para conteos, índices y cálculos sin decimales.",ex:"edad = 20"},
+    {w:"float",cat:"tipo de dato",def:"Representa un número con decimales.",use:"Se usa para cálculos que requieren precisión decimal, como precios.",ex:"precio = 9.99"},
+    {w:"bool",cat:"tipo de dato",def:"Representa un valor booleano: True o False.",use:"Se usa en condiciones lógicas.",ex:"activo = bool(1) # True"},
+    {w:"print()",cat:"función",def:"Muestra información en la consola.",use:"Se usa constantemente para depurar y mostrar resultados.",ex:"print('Hola mundo')"},
+    {w:"len()",cat:"función",def:"Devuelve la cantidad de elementos que tiene una colección o el largo de una cadena.",use:"Se usa para saber el tamaño de listas, cadenas o diccionarios.",ex:"len('hola') # 4"},
+    {w:"range()",cat:"función",def:"Genera una secuencia de números, útil para controlar ciclos for.",use:"Se usa para repetir un bloque un número determinado de veces.",ex:"for i in range(5):\n    print(i)"},
+    {w:"comprensión de listas",cat:"sintaxis",def:"Una forma compacta de crear una nueva lista a partir de otra.",use:"Se usa para transformar o filtrar datos en una sola línea legible.",ex:"cuadrados = [n**2 for n in range(5)]"},
+    {w:"*args / **kwargs",cat:"sintaxis",def:"Permiten que una función reciba una cantidad variable de argumentos.",use:"Se usa cuando no se sabe de antemano cuántos argumentos recibirá la función.",ex:"def sumar(*args):\n    return sum(args)"},
+    {w:"@decorador",cat:"sintaxis",def:"Una función que envuelve a otra para modificar o extender su comportamiento.",use:"Se usa para añadir funcionalidad reutilizable sin cambiar el código original.",ex:"@staticmethod\ndef util(): pass"},
+    {w:"f-string",cat:"sintaxis",def:"Una forma de insertar variables directamente dentro de una cadena de texto usando f'...'.",use:"Se usa para construir textos combinando variables de forma legible.",ex:"nombre = 'Ana'\nprint(f'Hola, {nombre}')"},
+    {w:"__name__",cat:"variable especial",def:"Contiene el nombre del módulo actual; vale '__main__' si el archivo se ejecuta directamente.",use:"Se usa para controlar qué código se ejecuta solo al correr el archivo directamente.",ex:"if __name__ == '__main__':\n    print('Ejecutando directamente')"},
+    {w:"type()",cat:"función",def:"Devuelve el tipo de dato de un valor.",use:"Se usa para comprobar qué tipo de dato se está manejando.",ex:"type(5) # <class 'int'>"},
+    {w:"input()",cat:"función",def:"Lee una línea de texto que el usuario escribe por teclado.",use:"Se usa para pedir datos al usuario en programas de consola.",ex:"nombre = input('¿Cómo te llamas? ')"},
+    {w:"sorted()",cat:"función",def:"Devuelve una nueva lista ordenada a partir de cualquier colección, sin modificar la original.",use:"Se usa para ordenar datos sin alterar la lista de origen.",ex:"sorted([3,1,2]) # [1,2,3]"},
+    {w:"enumerate()",cat:"función",def:"Recorre una colección devolviendo tanto el índice como el valor de cada elemento.",use:"Se usa cuando se necesita saber la posición de cada elemento mientras se recorre.",ex:"for i, valor in enumerate(['a','b']):\n    print(i, valor)"},
+    {w:"zip()",cat:"función",def:"Combina varias colecciones en pares, elemento por elemento.",use:"Se usa para recorrer dos listas relacionadas al mismo tiempo.",ex:"list(zip([1,2],['a','b'])) # [(1,'a'),(2,'b')]"},
+    {w:"map()",cat:"función",def:"Aplica una función a cada elemento de una colección y devuelve el resultado.",use:"Se usa para transformar todos los elementos de una lista sin escribir un ciclo.",ex:"list(map(lambda n: n*2, [1,2,3])) # [2,4,6]"},
+    {w:"filter()",cat:"función",def:"Devuelve los elementos de una colección que cumplen una condición.",use:"Se usa para quedarse solo con los datos que interesan.",ex:"list(filter(lambda n: n>1, [1,2,3])) # [2,3]"},
+    {w:"any() / all()",cat:"función",def:"any devuelve True si al menos un elemento es verdadero; all devuelve True solo si todos lo son.",use:"Se usan para comprobar condiciones sobre colecciones completas.",ex:"any([False, True]) # True\nall([True, True]) # True"},
+    {w:"isinstance()",cat:"función",def:"Comprueba si un objeto es de un tipo determinado.",use:"Se usa para validar el tipo de un dato antes de operar con él.",ex:"isinstance(5, int) # True"},
+    {w:"super()",cat:"función",def:"Da acceso a los métodos de la clase padre desde una subclase.",use:"Se usa para reutilizar comportamiento heredado, comúnmente en __init__.",ex:"class Cachorro(Perro):\n    def __init__(self, nombre):\n        super().__init__(nombre)"},
+    {w:"@staticmethod / @classmethod",cat:"decorador",def:"staticmethod define un método que no usa self ni la clase; classmethod recibe la clase (cls) en vez de la instancia.",use:"Se usan para métodos de utilidad relacionados con la clase pero no con un objeto específico.",ex:"class Util:\n    @staticmethod\n    def sumar(a,b): return a+b"},
+    {w:"@property",cat:"decorador",def:"Convierte un método en algo que se accede como si fuera un atributo.",use:"Se usa para calcular o validar un valor cada vez que se consulta como propiedad.",ex:"class Circulo:\n    @property\n    def area(self):\n        return self.r**2 * 3.14"},
+    {w:"slicing [inicio:fin]",cat:"sintaxis",def:"Extrae una porción de una lista o cadena indicando dónde empieza y termina.",use:"Se usa para obtener subconjuntos de datos sin escribir un ciclo.",ex:"'programación'[0:4] # 'prog'"},
+    {w:"desempaquetado (unpacking)",cat:"sintaxis",def:"Asigna varios valores de una colección a varias variables en una sola línea.",use:"Se usa para repartir los valores de una tupla o lista de forma legible.",ex:"a, b = (1, 2)"},
+    {w:":= (operador morsa)",cat:"operador",def:"Asigna un valor a una variable y devuelve ese valor en la misma expresión.",use:"Se usa para asignar y comprobar una condición al mismo tiempo, ahorrando líneas.",ex:"if (n := len(datos)) > 5:\n    print(n)"},
+    {w:"match / case",cat:"control de flujo",def:"Compara un valor contra varios patrones posibles, similar a switch en otros lenguajes.",use:"Se usa como alternativa moderna y más clara a muchos if/elif encadenados.",ex:"match dia:\n    case 1:\n        print('Lunes')\n    case _:\n        print('Otro')"},
+    {w:"Exception",cat:"clase base",def:"Es la clase base de la que heredan la mayoría de los errores en Python.",use:"Se usa para capturar errores generales o crear excepciones personalizadas.",ex:"class MiError(Exception):\n    pass"}
+  ]},
+
+  java: { name:"Java", color:"#3a4a7a", words:[
+    {w:"public",cat:"modificador de acceso",def:"Indica que una clase, método o atributo puede usarse desde cualquier otra clase.",use:"Se usa para exponer lo que otras partes del programa necesitan usar.",ex:"public class Persona { }"},
+    {w:"private",cat:"modificador de acceso",def:"Indica que un atributo o método solo puede usarse dentro de la misma clase.",use:"Se usa para proteger los datos internos de un objeto (encapsulamiento).",ex:"private String nombre;"},
+    {w:"protected",cat:"modificador de acceso",def:"Indica que un atributo o método es visible para la propia clase y sus subclases.",use:"Se usa cuando se quiere compartir algo solo con clases que heredan.",ex:"protected int edad;"},
+    {w:"class",cat:"programación orientada a objetos",def:"Define una plantilla para crear objetos con atributos y métodos comunes.",use:"Se usa para modelar entidades del mundo real como Usuario o Producto.",ex:"public class Perro { }"},
+    {w:"interface",cat:"programación orientada a objetos",def:"Define un conjunto de métodos que una clase se compromete a implementar.",use:"Se usa para garantizar que distintas clases compartan un comportamiento esperado.",ex:"interface Animal {\n    void hacerSonido();\n}"},
+    {w:"extends",cat:"programación orientada a objetos",def:"Permite que una clase herede atributos y métodos de otra clase (clase padre).",use:"Se usa para reutilizar y especializar comportamiento entre clases relacionadas.",ex:"class Cachorro extends Perro { }"},
+    {w:"implements",cat:"programación orientada a objetos",def:"Indica que una clase cumple con el contrato definido por una o más interfaces.",use:"Se usa para que una clase garantice tener ciertos métodos definidos.",ex:"class Gato implements Animal { }"},
+    {w:"static",cat:"modificador",def:"Indica que un método o atributo pertenece a la clase en sí, no a cada objeto.",use:"Se usa para valores o funciones compartidas por todos los objetos de una clase.",ex:"static int contador = 0;"},
+    {w:"final",cat:"modificador",def:"Indica que una variable no puede cambiar de valor, o que una clase/método no puede modificarse por herencia.",use:"Se usa para constantes y para evitar que ciertas clases sean sobrescritas.",ex:"final double PI = 3.1416;"},
+    {w:"void",cat:"tipo de retorno",def:"Indica que un método no devuelve ningún valor.",use:"Se usa para métodos que realizan una acción pero no producen un resultado.",ex:"void saludar() {\n    System.out.println('Hola');\n}"},
+    {w:"int",cat:"tipo de dato primitivo",def:"Representa un número entero de 32 bits, sin decimales.",use:"Se usa para conteos, índices y cálculos enteros.",ex:"int edad = 20;"},
+    {w:"byte",cat:"tipo de dato primitivo",def:"Representa un número entero muy pequeño, de 8 bits (-128 a 127).",use:"Se usa para ahorrar memoria cuando se sabe que el valor será muy pequeño.",ex:"byte nivel = 5;"},
+    {w:"short",cat:"tipo de dato primitivo",def:"Representa un número entero de 16 bits, más pequeño que int.",use:"Se usa cuando se necesita ahorrar memoria y el rango de int es innecesario.",ex:"short anio = 2026;"},
+    {w:"long",cat:"tipo de dato primitivo",def:"Representa un número entero de 64 bits, para valores muy grandes.",use:"Se usa cuando un int se queda corto, por ejemplo con marcas de tiempo.",ex:"long poblacion = 8000000000L;"},
+    {w:"float",cat:"tipo de dato primitivo",def:"Representa un número decimal de precisión simple (32 bits).",use:"Se usa para decimales cuando no se requiere tanta precisión como double.",ex:"float precio = 9.99f;"},
+    {w:"double",cat:"tipo de dato primitivo",def:"Representa un número decimal de doble precisión (64 bits), el más usado para decimales.",use:"Se usa para la mayoría de los cálculos con decimales.",ex:"double promedio = 8.75;"},
+    {w:"char",cat:"tipo de dato primitivo",def:"Representa un único carácter Unicode, escrito entre comillas simples.",use:"Se usa para guardar letras, dígitos o símbolos individuales.",ex:"char inicial = 'A';"},
+    {w:"boolean",cat:"tipo de dato primitivo",def:"Representa un valor lógico: true o false.",use:"Se usa en condiciones y comparaciones.",ex:"boolean activo = true;"},
+    {w:"String",cat:"tipo de dato",def:"Representa una cadena de texto; en Java es una clase, no un tipo primitivo.",use:"Se usa para almacenar y manipular texto.",ex:"String nombre = 'Ana';"},
+    {w:"new",cat:"operador",def:"Crea una nueva instancia (objeto) a partir de una clase.",use:"Se usa cada vez que se necesita un objeto nuevo en memoria.",ex:"Perro miPerro = new Perro();"},
+    {w:"this",cat:"palabra especial",def:"Hace referencia al objeto actual dentro de sus propios métodos o constructor.",use:"Se usa para diferenciar un atributo de un parámetro con el mismo nombre.",ex:"this.nombre = nombre;"},
+    {w:"super",cat:"palabra especial",def:"Hace referencia a la clase padre, permitiendo acceder a su constructor o métodos.",use:"Se usa dentro de una subclase para reutilizar comportamiento heredado.",ex:"super();"},
+    {w:"if",cat:"control de flujo",def:"Ejecuta un bloque solo si una condición es verdadera.",use:"Sirve para tomar decisiones dentro del programa.",ex:"if (edad >= 18) { }"},
+    {w:"else",cat:"control de flujo",def:"Define el bloque alternativo que se ejecuta si la condición del if fue falsa.",use:"Se usa junto a if para cubrir el caso contrario.",ex:"if (edad >= 18) { } else { }"},
+    {w:"for",cat:"control de flujo",def:"Repite un bloque de código un número determinado de veces mediante un contador.",use:"Se usa para recorrer arreglos o repetir una acción un número fijo de veces.",ex:"for (int i=0;i<3;i++) { }"},
+    {w:"while",cat:"control de flujo",def:"Repite un bloque de código mientras una condición se cumpla.",use:"Se usa cuando no se sabe de antemano cuántas repeticiones habrá.",ex:"while (n < 3) { n++; }"},
+    {w:"do-while",cat:"control de flujo",def:"Como while, pero garantiza que el bloque se ejecute al menos una vez.",use:"Se usa cuando la acción debe ocurrir mínimo una vez.",ex:"do { n++; } while (n < 3);"},
+    {w:"switch",cat:"control de flujo",def:"Compara un valor contra varias opciones (case) y ejecuta el bloque correspondiente.",use:"Sirve como alternativa más clara a muchos if/else encadenados.",ex:"switch (dia) {\n    case 1: break;\n}"},
+    {w:"break",cat:"instrucción",def:"Termina un ciclo o switch por completo.",use:"Se usa para salir de un ciclo antes de tiempo.",ex:"if (i==3) break;"},
+    {w:"continue",cat:"instrucción",def:"Salta a la siguiente vuelta de un ciclo.",use:"Se usa para omitir un caso concreto dentro de un ciclo.",ex:"if (i%2==0) continue;"},
+    {w:"return",cat:"instrucción",def:"Termina un método y opcionalmente devuelve un valor.",use:"Se usa para entregar el resultado calculado por un método.",ex:"return edad * 2;"},
+    {w:"try",cat:"manejo de errores",def:"Marca un bloque de código que podría fallar.",use:"Se usa para manejar errores sin que el programa se detenga.",ex:"try { } catch (Exception e) { }"},
+    {w:"catch",cat:"manejo de errores",def:"Captura y maneja un error ocurrido dentro de un bloque try.",use:"Se usa para responder ante un fallo de forma controlada.",ex:"catch (ArithmeticException e) { }"},
+    {w:"finally",cat:"manejo de errores",def:"Define un bloque que se ejecuta siempre, haya error o no.",use:"Se usa para tareas de limpieza, como cerrar recursos.",ex:"finally { System.out.println('Fin'); }"},
+    {w:"throw",cat:"manejo de errores",def:"Lanza un error manualmente en el código.",use:"Se usa para señalar de forma explícita que algo salió mal.",ex:"throw new Exception('Error');"},
+    {w:"throws",cat:"manejo de errores",def:"Declara que un método puede lanzar cierto tipo de excepción.",use:"Se usa en la firma del método para avisar a quien lo llame.",ex:"void metodo() throws Exception { }"},
+    {w:"import",cat:"módulos",def:"Trae clases de otros paquetes al archivo actual.",use:"Se usa para reutilizar código entre distintos archivos.",ex:"import java.util.ArrayList;"},
+    {w:"package",cat:"módulos",def:"Agrupa clases relacionadas bajo un mismo espacio de nombres.",use:"Se usa para organizar el código de un proyecto grande.",ex:"package com.blitz.app;"},
+    {w:"null",cat:"valor especial",def:"Representa que una variable de tipo objeto no apunta a ningún objeto en memoria.",use:"Se usa para indicar ausencia de valor en variables de tipo referencia.",ex:"String nombre = null;"},
+    {w:"true / false",cat:"valor booleano",def:"Los dos valores posibles de una variable boolean.",use:"Se usan en condiciones lógicas.",ex:"boolean activo = true;"},
+    {w:"instanceof",cat:"operador",def:"Comprueba si un objeto es instancia de una clase o interfaz determinada.",use:"Se usa antes de convertir un objeto a un tipo más específico.",ex:"if (animal instanceof Gato) { }"},
+    {w:"abstract",cat:"modificador",def:"Define una clase o método que no está completamente implementado y debe completarse en una subclase.",use:"Se usa para forzar que las clases hijas definan cierto comportamiento.",ex:"abstract double area();"},
+    {w:"synchronized",cat:"modificador",def:"Restringe el acceso a un método o bloque para que solo un hilo lo ejecute a la vez.",use:"Se usa en programación concurrente para evitar condiciones de carrera.",ex:"synchronized void depositar() { }"},
+    {w:"enum",cat:"tipo de dato",def:"Define un tipo con un conjunto fijo y limitado de valores posibles.",use:"Se usa para representar opciones cerradas, como días o estados.",ex:"enum Dia { LUNES, MARTES }"},
+    {w:"generics <T>",cat:"programación genérica",def:"Permiten escribir clases y métodos que funcionan con cualquier tipo de dato, definido al usarlos.",use:"Se usa para reutilizar código sin perder seguridad de tipos.",ex:"class Caja<T> {\n    T contenido;\n}"},
+    {w:"ArrayList<T>",cat:"estructura de datos",def:"Una lista de tamaño dinámico, parte de la Java Collections Framework.",use:"Se usa para almacenar colecciones cuando no se sabe el tamaño de antemano.",ex:"ArrayList<String> nombres = new ArrayList<>();"},
+    {w:"HashMap<K,V>",cat:"estructura de datos",def:"Una colección de pares clave-valor sin orden garantizado.",use:"Se usa para buscar valores rápidamente a partir de una clave.",ex:"HashMap<String,Integer> edades = new HashMap<>();"},
+    {w:"main",cat:"método especial",def:"Es el método por donde comienza a ejecutarse cualquier programa en Java.",use:"Todo programa Java ejecutable necesita este método.",ex:"public static void main(String[] args) { }"},
+    {w:"System.out.println()",cat:"función",def:"Muestra información en la consola, agregando un salto de línea al final.",use:"Se usa constantemente para depurar y mostrar resultados.",ex:"System.out.println('Hola mundo');"},
+    {w:"Scanner",cat:"clase de biblioteca",def:"Una clase que permite leer datos ingresados por el usuario desde el teclado.",use:"Se usa para programas de consola que piden datos al usuario.",ex:"Scanner sc = new Scanner(System.in);\nint edad = sc.nextInt();"},
+    {w:"?: (operador ternario)",cat:"operador",def:"Una forma corta de escribir un if/else que devuelve un valor.",use:"Se usa para asignaciones condicionales simples en una sola línea.",ex:"String r = (edad >= 18) ? 'Mayor' : 'Menor';"},
+    {w:"paquete por defecto (package-private)",cat:"modificador de acceso",def:"Cuando no se escribe ningún modificador, el miembro solo es visible dentro del mismo paquete.",use:"Se usa cuando algo debe compartirse entre clases del mismo paquete pero no fuera de él.",ex:"class Util { int valor; }"},
+    {w:"this()",cat:"constructor",def:"Llama a otro constructor de la misma clase desde dentro de un constructor.",use:"Se usa para evitar repetir código entre varios constructores.",ex:"Persona() {\n    this('Sin nombre');\n}"},
+    {w:"bloque estático",cat:"inicialización",def:"Un bloque de código marcado con static que se ejecuta una sola vez, al cargar la clase.",use:"Se usa para inicializar datos estáticos complejos.",ex:"static {\n    System.out.println('Clase cargada');\n}"},
+    {w:"equals()",cat:"método de Object",def:"Compara si dos objetos son considerados iguales según su contenido, no su dirección de memoria.",use:"Se usa (y se sobrescribe) para comparar objetos por su contenido, no por referencia.",ex:"persona1.equals(persona2);"},
+    {w:"hashCode()",cat:"método de Object",def:"Devuelve un número entero que representa al objeto, usado por estructuras como HashMap.",use:"Se sobrescribe junto con equals() para que los objetos funcionen bien en colecciones basadas en hash.",ex:"@Override\npublic int hashCode() { return nombre.hashCode(); }"},
+    {w:"toString()",cat:"método de Object",def:"Devuelve una representación en texto de un objeto.",use:"Se sobrescribe para que imprimir un objeto muestre información útil en vez de su dirección de memoria.",ex:"@Override\npublic String toString() { return nombre; }"},
+    {w:"Comparable<T>",cat:"interfaz",def:"Permite definir un orden natural entre objetos de una clase, implementando compareTo().",use:"Se usa para que una lista de objetos propios pueda ordenarse automáticamente.",ex:"class Persona implements Comparable<Persona> {\n    public int compareTo(Persona p) { return edad - p.edad; }\n}"},
+    {w:"Iterator<T>",cat:"interfaz",def:"Permite recorrer una colección elemento por elemento sin conocer su estructura interna.",use:"Se usa internamente por los ciclos for-each sobre colecciones.",ex:"Iterator<String> it = lista.iterator();\nwhile (it.hasNext()) { it.next(); }"},
+    {w:"List<T>",cat:"interfaz",def:"Representa una colección ordenada que permite elementos repetidos.",use:"Se usa como tipo general para trabajar con ArrayList, LinkedList, etc.",ex:"List<String> nombres = new ArrayList<>();"},
+    {w:"Map<K,V>",cat:"interfaz",def:"Representa una colección de pares clave-valor.",use:"Se usa como tipo general para trabajar con HashMap, TreeMap, etc.",ex:"Map<String,Integer> edades = new HashMap<>();"},
+    {w:"Set<T>",cat:"interfaz",def:"Representa una colección de elementos únicos, sin duplicados.",use:"Se usa cuando importa la pertenencia y no se permiten repetidos.",ex:"Set<Integer> numeros = new HashSet<>();"},
+    {w:"LinkedList<T>",cat:"estructura de datos",def:"Una lista implementada como una cadena de nodos enlazados, eficiente para insertar y quitar elementos.",use:"Se usa cuando se necesitan muchas inserciones o eliminaciones frecuentes.",ex:"LinkedList<String> lista = new LinkedList<>();"},
+    {w:"Stack<T>",cat:"estructura de datos",def:"Una colección que sigue el principio LIFO (último en entrar, primero en salir).",use:"Se usa para deshacer acciones o evaluar expresiones, entre otros casos.",ex:"Stack<Integer> pila = new Stack<>();\npila.push(1);"},
+    {w:"Queue<T>",cat:"estructura de datos",def:"Una colección que sigue el principio FIFO (primero en entrar, primero en salir).",use:"Se usa para procesar tareas en el orden en que llegaron.",ex:"Queue<String> cola = new LinkedList<>();"},
+    {w:"Optional<T>",cat:"programación funcional",def:"Envuelve un valor que puede estar presente o ausente, evitando el uso directo de null.",use:"Se usa para representar de forma explícita que un valor podría no existir.",ex:"Optional<String> nombre = Optional.of('Ana');"},
+    {w:"Stream API",cat:"programación funcional",def:"Permite procesar colecciones de datos con operaciones encadenadas como filter, map y collect.",use:"Se usa para transformar y filtrar datos de forma declarativa y legible.",ex:"lista.stream().filter(n -> n>2).forEach(System.out::println);"},
+    {w:"expresión lambda (->)",cat:"programación funcional",def:"Una forma corta de escribir una implementación de una interfaz funcional.",use:"Se usa para pasar comportamiento como si fuera un dato, por ejemplo en Streams.",ex:"lista.forEach(n -> System.out.println(n));"},
+    {w:"interfaz funcional",cat:"programación funcional",def:"Una interfaz con un único método abstracto, que puede implementarse con una lambda.",use:"Se usa como base para trabajar con lambdas y referencias a métodos.",ex:"interface Operacion { int aplicar(int a, int b); }"},
+    {w:"varargs (...)",cat:"sintaxis",def:"Permite que un método reciba una cantidad variable de argumentos del mismo tipo.",use:"Se usa cuando no se sabe de antemano cuántos argumentos recibirá el método.",ex:"int sumar(int... numeros) { }"},
+    {w:"autoboxing / unboxing",cat:"concepto",def:"La conversión automática entre un tipo primitivo (como int) y su clase envolvente (como Integer).",use:"Ocurre automáticamente al usar tipos primitivos en colecciones genéricas.",ex:"Integer edad = 20; // autoboxing"},
+    {w:"clases envolventes (Integer, Double...)",cat:"tipo de dato",def:"Versiones en forma de objeto de los tipos primitivos, con métodos útiles adicionales.",use:"Se usan cuando se necesita tratar un número como objeto, por ejemplo en colecciones.",ex:"Integer.parseInt('20');"},
+    {w:"sobrecarga de métodos (overloading)",cat:"programación orientada a objetos",def:"Definir varios métodos con el mismo nombre pero distintos parámetros.",use:"Se usa para ofrecer varias formas de llamar a una acción similar.",ex:"void sumar(int a, int b) { }\nvoid sumar(double a, double b) { }"},
+    {w:"sobrescritura de métodos (overriding)",cat:"programación orientada a objetos",def:"Redefinir en una subclase un método ya definido en la clase padre.",use:"Se usa para personalizar el comportamiento heredado.",ex:"@Override\nvoid sonido() { }"},
+    {w:"excepción comprobada (checked)",cat:"manejo de errores",def:"Un tipo de excepción que el compilador obliga a manejar con try/catch o declarar con throws.",use:"Se usa para errores previsibles, como problemas de archivos o de red.",ex:"void leer() throws IOException { }"},
+    {w:"excepción no comprobada (unchecked)",cat:"manejo de errores",def:"Un tipo de excepción que el compilador no obliga a manejar, como RuntimeException.",use:"Suele representar errores de programación, como dividir entre cero.",ex:"throw new RuntimeException('Error');"},
+    {w:"try-with-resources",cat:"manejo de errores",def:"Una forma de try que cierra automáticamente los recursos usados, sin necesidad de un finally manual.",use:"Se usa al trabajar con archivos, conexiones o cualquier recurso que deba cerrarse.",ex:"try (Scanner sc = new Scanner(System.in)) { }"},
+    {w:"Runnable",cat:"interfaz",def:"Representa una tarea que puede ejecutarse, típicamente en un hilo separado.",use:"Se usa para definir el código que un hilo (Thread) va a ejecutar.",ex:"Runnable tarea = () -> System.out.println('Hola');"},
+    {w:"Thread",cat:"clase",def:"Representa un hilo de ejecución independiente dentro de un programa.",use:"Se usa para ejecutar tareas en paralelo, sin bloquear el hilo principal.",ex:"Thread hilo = new Thread(tarea);\nhilo.start();"},
+    {w:"StringBuilder",cat:"clase de biblioteca",def:"Permite construir y modificar cadenas de texto de forma eficiente, sin crear muchos objetos String intermedios.",use:"Se usa cuando se concatenan muchas cadenas dentro de un ciclo.",ex:"StringBuilder sb = new StringBuilder();\nsb.append('Hola');"},
+    {w:"String.format()",cat:"método",def:"Construye una cadena de texto insertando valores en posiciones específicas con un formato definido.",use:"Se usa para dar formato controlado a textos con números o variables.",ex:"String.format('Edad: %d', 20);"},
+    {w:"== vs equals()",cat:"concepto",def:"== compara si dos referencias apuntan al mismo objeto en memoria; equals() compara el contenido.",use:"Se usa equals() para comparar el valor real de dos objetos, no su dirección.",ex:"nombre1.equals(nombre2);"},
+    {w:"arreglo (int[])",cat:"tipo de dato",def:"Una colección de tamaño fijo de elementos del mismo tipo.",use:"Se usa para guardar varios valores del mismo tipo bajo un solo nombre.",ex:"int[] numeros = {1,2,3};"},
+    {w:"arreglo bidimensional",cat:"tipo de dato",def:"Un arreglo de arreglos, usado para representar tablas o matrices.",use:"Se usa para datos organizados en filas y columnas, como un tablero.",ex:"int[][] matriz = new int[3][3];"},
+    {w:"Character",cat:"clase de biblioteca",def:"Ofrece métodos de utilidad para trabajar con caracteres, como comprobar si es letra o número.",use:"Se usa para validar o transformar caracteres individuales.",ex:"Character.isDigit('5'); // true"}
+  ]},
+
+  c: { name:"C", color:"#6b4a2e", words:[
+    {w:"int",cat:"tipo de dato",def:"Representa un número entero.",use:"Se usa para conteos, índices y cálculos sin decimales.",ex:"int edad = 20;"},
+    {w:"short",cat:"tipo de dato",def:"Representa un número entero más pequeño que int, ahorrando memoria.",use:"Se usa cuando se sabe que el valor será pequeño.",ex:"short anio = 2026;"},
+    {w:"long",cat:"tipo de dato",def:"Representa un número entero más grande que int.",use:"Se usa cuando un int se queda corto para el valor necesario.",ex:"long poblacion = 8000000000;"},
+    {w:"unsigned",cat:"modificador de tipo",def:"Indica que un tipo entero solo admite valores positivos (o cero), duplicando su rango positivo.",use:"Se usa cuando el valor nunca será negativo, como un conteo.",ex:"unsigned int edad = 20;"},
+    {w:"float",cat:"tipo de dato",def:"Representa un número decimal de precisión simple.",use:"Se usa para cálculos con decimales que no requieren máxima precisión.",ex:"float precio = 9.99;"},
+    {w:"double",cat:"tipo de dato",def:"Representa un número decimal de doble precisión, más exacto que float.",use:"Se usa para la mayoría de los cálculos con decimales.",ex:"double promedio = 8.756;"},
+    {w:"char",cat:"tipo de dato",def:"Representa un único carácter.",use:"Se usa para guardar letras, dígitos o símbolos individuales.",ex:"char letra = 'A';"},
+    {w:"void",cat:"tipo de dato / retorno",def:"Indica ausencia de tipo: una función void no devuelve nada, y void* es un puntero sin tipo definido.",use:"Se usa en funciones que solo ejecutan una acción sin devolver resultado.",ex:"void saludar() {\n    printf('Hola');\n}"},
+    {w:"if",cat:"control de flujo",def:"Ejecuta un bloque solo si una condición es verdadera.",use:"Sirve para tomar decisiones dentro del programa.",ex:"if (edad >= 18) { }"},
+    {w:"else",cat:"control de flujo",def:"Define el bloque alternativo que se ejecuta si la condición del if fue falsa.",use:"Se usa junto a if para cubrir el caso contrario.",ex:"if (edad >= 18) { } else { }"},
+    {w:"for",cat:"control de flujo",def:"Repite un bloque de código un número determinado de veces mediante un contador.",use:"Se usa para recorrer arreglos o repetir una acción un número fijo de veces.",ex:"for (int i=0;i<3;i++) { }"},
+    {w:"while",cat:"control de flujo",def:"Repite un bloque de código mientras una condición se cumpla.",use:"Se usa cuando no se sabe de antemano cuántas repeticiones habrá.",ex:"while (n < 3) { n++; }"},
+    {w:"do-while",cat:"control de flujo",def:"Como while, pero garantiza que el bloque se ejecute al menos una vez.",use:"Se usa cuando la acción debe ocurrir mínimo una vez.",ex:"do { n++; } while (n < 3);"},
+    {w:"switch",cat:"control de flujo",def:"Compara un valor contra varias opciones (case) y ejecuta el bloque correspondiente.",use:"Sirve como alternativa más clara a muchos if/else encadenados.",ex:"switch (dia) {\n    case 1: break;\n}"},
+    {w:"break",cat:"instrucción",def:"Termina un ciclo o switch por completo.",use:"Se usa para salir de un ciclo antes de tiempo.",ex:"if (i==3) break;"},
+    {w:"continue",cat:"instrucción",def:"Salta a la siguiente vuelta de un ciclo.",use:"Se usa para omitir un caso concreto dentro de un ciclo.",ex:"if (i%2==0) continue;"},
+    {w:"return",cat:"instrucción",def:"Termina una función y opcionalmente devuelve un valor.",use:"Se usa para entregar el resultado calculado por una función.",ex:"return n * 2;"},
+    {w:"struct",cat:"estructura de datos",def:"Agrupa varias variables de distintos tipos bajo un solo nombre, formando un nuevo tipo compuesto.",use:"Se usa para representar entidades con varios datos relacionados.",ex:"struct Punto { int x, y; };"},
+    {w:"typedef",cat:"declaración",def:"Crea un nombre alternativo (alias) para un tipo de dato existente.",use:"Se usa para simplificar la escritura de tipos complejos.",ex:"typedef struct Punto Punto;"},
+    {w:"enum",cat:"tipo de dato",def:"Define un tipo con un conjunto fijo de valores enteros con nombres descriptivos.",use:"Se usa para representar opciones limitadas de forma legible.",ex:"enum Dia { LUNES, MARTES };"},
+    {w:"union",cat:"estructura de datos",def:"Agrupa varias variables que comparten el mismo espacio de memoria.",use:"Se usa para ahorrar memoria cuando distintos datos nunca se necesitan al mismo tiempo.",ex:"union Dato { int entero; float decimal; };"},
+    {w:"sizeof",cat:"operador",def:"Devuelve el tamaño en bytes que ocupa un tipo o una variable en memoria.",use:"Se usa frecuentemente al reservar memoria dinámica con malloc.",ex:"sizeof(int); // normalmente 4"},
+    {w:"const",cat:"modificador",def:"Indica que el valor de una variable no debe modificarse después de asignarse.",use:"Se usa para proteger valores que no deberían cambiar.",ex:"const float PI = 3.1416;"},
+    {w:"static",cat:"modificador",def:"Dentro de una función, hace que una variable conserve su valor entre llamadas; a nivel de archivo, limita su visibilidad a ese archivo.",use:"Se usa para variables que deben 'recordar' su valor o para ocultar detalles internos.",ex:"static int veces = 0;"},
+    {w:"extern",cat:"modificador",def:"Indica que una variable o función está definida en otro archivo del proyecto.",use:"Se usa para compartir variables o funciones entre varios archivos fuente.",ex:"extern int contadorGlobal;"},
+    {w:"puntero (*)",cat:"tipo de dato",def:"Una variable que guarda la dirección de memoria de otra variable.",use:"Se usa para modificar variables desde funciones y manejar memoria dinámica.",ex:"int *p = &edad;"},
+    {w:"& (dirección de)",cat:"operador",def:"Obtiene la dirección de memoria en la que se encuentra almacenada una variable.",use:"Se usa junto con punteros y para pasar variables por referencia.",ex:"int *p = &edad;"},
+    {w:"malloc",cat:"gestión de memoria",def:"Reserva un bloque de memoria dinámica durante la ejecución del programa.",use:"Se usa para crear estructuras de datos cuyo tamaño no se conoce al compilar.",ex:"int *arr = malloc(5 * sizeof(int));"},
+    {w:"free",cat:"gestión de memoria",def:"Libera un bloque de memoria previamente reservado con malloc.",use:"Se usa para evitar fugas de memoria una vez que ya no se necesita el dato.",ex:"free(arr);"},
+    {w:"NULL",cat:"valor especial",def:"Representa un puntero que no apunta a ninguna dirección de memoria válida.",use:"Se usa para inicializar punteros o verificar si una operación falló.",ex:"int *p = NULL;"},
+    {w:"#include",cat:"directiva de preprocesador",def:"Incorpora el contenido de otro archivo (normalmente una biblioteca) antes de compilar.",use:"Se usa para acceder a funciones ya escritas, como printf.",ex:"#include <stdio.h>"},
+    {w:"#define",cat:"directiva de preprocesador",def:"Define una constante o macro reemplazada literalmente antes de compilar.",use:"Se usa para constantes simples o fragmentos de código reutilizables.",ex:"#define MAX 100"},
+    {w:"printf",cat:"función de biblioteca",def:"Muestra texto formateado en pantalla.",use:"Se usa para la salida de datos en programas de consola.",ex:"printf('Tienes %d años\\n', edad);"},
+    {w:"scanf",cat:"función de biblioteca",def:"Lee datos que el usuario escribe por teclado.",use:"Se usa para la entrada de datos en programas de consola.",ex:"scanf('%d', &edad);"},
+    {w:"arreglo ([])",cat:"tipo de dato",def:"Una colección de elementos del mismo tipo, almacenados de forma contigua en memoria.",use:"Se usa para guardar varios valores del mismo tipo bajo un solo nombre.",ex:"int numeros[5] = {1,2,3,4,5};"},
+    {w:"main()",cat:"función especial",def:"Es la función por donde comienza a ejecutarse cualquier programa en C.",use:"Todo programa en C necesita esta función.",ex:"int main() {\n    return 0;\n}"},
+    {w:"puntero a puntero (**)",cat:"tipo de dato",def:"Un puntero que guarda la dirección de memoria de otro puntero.",use:"Se usa en casos avanzados como matrices dinámicas o modificar punteros dentro de funciones.",ex:"int **pp = &p;"},
+    {w:"puntero a función",cat:"tipo de dato",def:"Una variable que guarda la dirección de una función, permitiendo llamarla indirectamente.",use:"Se usa para pasar comportamiento como parámetro, por ejemplo en callbacks.",ex:"int (*operacion)(int, int) = sumar;"},
+    {w:"recursividad",cat:"concepto",def:"Cuando una función se llama a sí misma para resolver un problema dividiéndolo en casos más pequeños.",use:"Se usa para problemas que se definen naturalmente en términos de sí mismos, como el factorial.",ex:"int factorial(int n) {\n    return n <= 1 ? 1 : n * factorial(n-1);\n}"},
+    {w:"archivo de cabecera (.h)",cat:"organización de código",def:"Un archivo que contiene declaraciones (no implementaciones completas) para compartir entre varios archivos .c.",use:"Se usa para separar la interfaz de una parte del programa de su implementación.",ex:"// operaciones.h\nint sumar(int a, int b);"},
+    {w:"guardas de inclusión (#ifndef)",cat:"directiva de preprocesador",def:"Evitan que el contenido de un archivo de cabecera se incluya más de una vez en la misma compilación.",use:"Se usa siempre en archivos .h para prevenir errores de redefinición.",ex:"#ifndef MIARCHIVO_H\n#define MIARCHIVO_H\n// ...\n#endif"},
+    {w:"operadores bit a bit (& | ^ ~ << >>)",cat:"operador",def:"Manipulan los bits individuales de un número: AND, OR, XOR, NOT, desplazamiento izquierdo y derecho.",use:"Se usan en programación de bajo nivel, banderas y optimizaciones.",ex:"int a = 5 & 3; // 1"},
+    {w:"% (módulo)",cat:"operador",def:"Devuelve el residuo de una división entera.",use:"Se usa para saber si un número es par/impar o para ciclos que se repiten en rangos.",ex:"7 % 2; // 1"},
+    {w:"++ / --",cat:"operador",def:"Incrementan o decrementan en uno el valor de una variable.",use:"Se usan comúnmente en ciclos para avanzar un contador.",ex:"int i = 0;\ni++; // i vale 1"},
+    {w:"operadores de asignación compuesta (+= -= *= /=)",cat:"operador",def:"Combinan una operación aritmética con una asignación en un solo paso.",use:"Se usan para modificar el valor de una variable de forma más breve.",ex:"int x = 5;\nx += 3; // x vale 8"},
+    {w:"operadores relacionales (== != < > <= >=)",cat:"operador",def:"Comparan dos valores y devuelven verdadero o falso.",use:"Se usan dentro de condiciones if, while, etc.",ex:"if (edad >= 18) { }"},
+    {w:"operadores lógicos (&& || !)",cat:"operador",def:"Combinan o invierten condiciones booleanas.",use:"Se usan para construir condiciones más complejas.",ex:"if (edad >= 18 && activo) { }"},
+    {w:"strlen / strcpy / strcmp",cat:"función de biblioteca (string.h)",def:"strlen calcula el largo de una cadena, strcpy la copia y strcmp las compara.",use:"Se usan para trabajar con cadenas de texto representadas como arreglos de char.",ex:"strlen('hola'); // 4"},
+    {w:"atoi",cat:"función de biblioteca (stdlib.h)",def:"Convierte una cadena de texto en un número entero.",use:"Se usa para transformar texto leído (por ejemplo de un archivo) en un número usable.",ex:"int n = atoi('25');"},
+    {w:"rand()",cat:"función de biblioteca (stdlib.h)",def:"Genera un número pseudoaleatorio.",use:"Se usa para simulaciones, juegos o cualquier cosa que requiera azar.",ex:"int n = rand() % 100;"},
+    {w:"calloc / realloc",cat:"gestión de memoria",def:"calloc reserva memoria inicializada en ceros; realloc cambia el tamaño de un bloque ya reservado.",use:"Se usan junto a malloc y free para gestionar memoria dinámica de forma más flexible.",ex:"int *arr = calloc(5, sizeof(int));"},
+    {w:"fopen / fclose",cat:"función de biblioteca (stdio.h)",def:"fopen abre un archivo para lectura o escritura; fclose lo cierra al terminar.",use:"Se usan para trabajar con archivos guardados en disco.",ex:"FILE *f = fopen('datos.txt', 'r');\nfclose(f);"},
+    {w:"fread / fwrite",cat:"función de biblioteca (stdio.h)",def:"Leen o escriben bloques de datos binarios en un archivo.",use:"Se usan para guardar o cargar datos estructurados de forma eficiente.",ex:"fwrite(&dato, sizeof(dato), 1, f);"},
+    {w:"getchar / putchar",cat:"función de biblioteca (stdio.h)",def:"Leen o escriben un solo carácter desde/hacia la consola.",use:"Se usan para entrada y salida de datos carácter por carácter.",ex:"char c = getchar();\nputchar(c);"},
+    {w:"fgets",cat:"función de biblioteca (stdio.h)",def:"Lee una línea completa de texto, incluyendo espacios, de forma más segura que scanf.",use:"Se usa para leer texto con espacios desde el teclado o un archivo.",ex:"char linea[100];\nfgets(linea, 100, stdin);"},
+    {w:"struct anidado",cat:"estructura de datos",def:"Una estructura que contiene como miembro otra estructura.",use:"Se usa para representar datos compuestos por partes más pequeñas, como una dirección dentro de una persona.",ex:"struct Persona {\n    struct Fecha nacimiento;\n};"},
+    {w:"-> (operador flecha)",cat:"operador",def:"Accede a un miembro de una estructura a través de un puntero a esa estructura.",use:"Se usa en vez del punto (.) cuando se tiene un puntero a struct.",ex:"struct Punto *p;\np->x = 5;"},
+    {w:"campos de bits",cat:"estructura de datos",def:"Permiten definir miembros de un struct que ocupan solo unos cuantos bits específicos.",use:"Se usa para ahorrar memoria cuando se necesitan muchos valores pequeños, como banderas.",ex:"struct Flags {\n    unsigned int activo : 1;\n};"},
+    {w:"volatile",cat:"modificador",def:"Indica al compilador que una variable puede cambiar en cualquier momento fuera del control normal del programa.",use:"Se usa en programación de bajo nivel, como con hardware o interrupciones.",ex:"volatile int bandera;"},
+    {w:"register",cat:"modificador",def:"Sugiere al compilador que guarde una variable en un registro del procesador para acceso más rápido.",use:"Es una optimización histórica; los compiladores modernos suelen decidir esto automáticamente.",ex:"register int i;"},
+    {w:"goto",cat:"instrucción",def:"Salta directamente a una etiqueta en otra parte del código.",use:"Se usa muy poco por dificultar la lectura; a veces aparece para salir de ciclos anidados.",ex:"goto fin;\n...\nfin:\n    printf('Terminado');"},
+    {w:"arreglo multidimensional",cat:"tipo de dato",def:"Un arreglo con más de una dimensión, como una matriz de filas y columnas.",use:"Se usa para representar tablas, matrices o tableros.",ex:"int matriz[3][3];"},
+    {w:"puntero void (void*)",cat:"tipo de dato",def:"Un puntero genérico que no tiene un tipo de dato definido.",use:"Se usa en funciones que deben manejar cualquier tipo de dato, como malloc.",ex:"void *p = malloc(10);"},
+    {w:"const con punteros",cat:"modificador",def:"Puede aplicarse al valor apuntado o al puntero mismo, controlando qué parte no puede modificarse.",use:"Se usa para proteger datos apuntados de modificaciones accidentales.",ex:"const int *p; // el valor apuntado no cambia"},
+    {w:"función inline",cat:"modificador (C99)",def:"Sugiere al compilador insertar el código de la función directamente donde se llama, evitando el costo de la llamada.",use:"Se usa para funciones muy pequeñas y usadas con frecuencia.",ex:"inline int doble(int n) { return n*2; }"},
+    {w:"#ifdef / #else / #endif",cat:"directiva de preprocesador",def:"Incluyen o excluyen partes del código antes de compilar, según si una macro está definida.",use:"Se usa para compilar código distinto según la plataforma o configuración.",ex:"#ifdef DEBUG\nprintf('Modo debug');\n#endif"},
+    {w:"argc / argv",cat:"parámetros de main",def:"argc indica cuántos argumentos se pasaron al programa; argv es un arreglo con esos argumentos como texto.",use:"Se usan para que un programa reciba datos desde la línea de comandos.",ex:"int main(int argc, char *argv[]) { }"},
+    {w:"código de retorno (exit code)",cat:"concepto",def:"El valor que devuelve main() al sistema operativo, indicando si el programa terminó bien (0) o con error.",use:"Se usa para que otros programas o scripts sepan si la ejecución fue exitosa.",ex:"return 0; // éxito\nreturn 1; // error"},
+    {w:"cadena de caracteres (char[])",cat:"tipo de dato",def:"En C, el texto se representa como un arreglo de caracteres terminado en el carácter nulo '\\0'.",use:"Se usa para almacenar y manipular texto, ya que C no tiene un tipo string nativo.",ex:"char nombre[] = 'Ana';"},
+    {w:"comentarios (// y /* */)",cat:"sintaxis",def:"Texto que el compilador ignora, usado para explicar el código.",use:"Se usa para documentar qué hace una parte del programa.",ex:"// Esto es un comentario\n/* Esto también */"},
+    {w:"tipo de dato con signo/sin signo (signed/unsigned)",cat:"modificador de tipo",def:"signed permite valores negativos y positivos; unsigned solo permite valores positivos, ampliando el rango positivo.",use:"Se usa según si el valor que se guardará puede o no ser negativo.",ex:"unsigned int contador = 0;"}
+  ]},
+
+  cpp: { name:"C++", color:"#5a3a6b", words:[
+    {w:"class",cat:"programación orientada a objetos",def:"Define una plantilla para crear objetos con atributos y métodos propios.",use:"Se usa para modelar entidades del mundo real de forma organizada.",ex:"class Perro {\npublic:\n    string nombre;\n};"},
+    {w:"struct",cat:"estructura de datos",def:"Similar a class, agrupa varios datos bajo un mismo nombre; por defecto sus miembros son públicos.",use:"Se usa para agrupar datos simples relacionados.",ex:"struct Punto { int x, y; };"},
+    {w:"public",cat:"modificador de acceso",def:"Indica que un miembro de una clase es accesible desde fuera de ella.",use:"Se usa para exponer lo que otras partes del programa necesitan usar.",ex:"public:\n    void mostrar();"},
+    {w:"private",cat:"modificador de acceso",def:"Indica que un miembro de una clase solo es accesible dentro de ella misma.",use:"Se usa para proteger los datos internos de un objeto.",ex:"private:\n    string nombre;"},
+    {w:"protected",cat:"modificador de acceso",def:"Indica que un miembro es accesible desde la propia clase y sus clases derivadas.",use:"Se usa para compartir algo solo con clases que heredan.",ex:"protected:\n    int edad;"},
+    {w:"virtual",cat:"herencia",def:"Permite que un método sea redefinido por una clase hija (polimorfismo).",use:"Se usa para que distintas clases respondan de forma diferente al mismo método.",ex:"virtual void sonido() { }"},
+    {w:"override",cat:"herencia",def:"Confirma explícitamente que un método está redefiniendo uno virtual de la clase padre.",use:"Se usa para evitar errores al sobrescribir métodos heredados.",ex:"void sonido() override { }"},
+    {w:"new",cat:"gestión de memoria",def:"Reserva memoria dinámica para un objeto.",use:"Se usa para crear objetos cuya cantidad no se conoce al compilar.",ex:"int* p = new int(5);"},
+    {w:"delete",cat:"gestión de memoria",def:"Libera la memoria reservada previamente con new.",use:"Se usa para evitar fugas de memoria cuando un objeto ya no se necesita.",ex:"delete p;"},
+    {w:"this",cat:"palabra especial",def:"Es un puntero al objeto actual dentro de sus propios métodos.",use:"Se usa para diferenciar un atributo de un parámetro con el mismo nombre.",ex:"this->nombre = nombre;"},
+    {w:"namespace",cat:"organización de código",def:"Agrupa nombres (funciones, clases, variables) bajo un identificador para evitar conflictos.",use:"Se usa para organizar código y prevenir que distintas bibliotecas choquen entre sí.",ex:"namespace mat { int sumar(int a,int b){return a+b;} }"},
+    {w:"using",cat:"declaración",def:"Permite usar nombres de un espacio de nombres sin escribir el prefijo completo.",use:"Se usa comúnmente para evitar escribir std:: antes de cada elemento.",ex:"using namespace std;"},
+    {w:"cout",cat:"entrada y salida",def:"Muestra información en pantalla.",use:"Se usa para la salida de datos en programas de consola.",ex:"cout << 'Hola';"},
+    {w:"cin",cat:"entrada y salida",def:"Lee datos que el usuario escribe por teclado.",use:"Se usa para la entrada de datos en programas de consola.",ex:"cin >> edad;"},
+    {w:"endl",cat:"entrada y salida",def:"Inserta un salto de línea y vacía el buffer de salida.",use:"Se usa junto a cout para terminar una línea impresa.",ex:"cout << 'Hola' << endl;"},
+    {w:"template",cat:"programación genérica",def:"Permite escribir funciones o clases que funcionan con cualquier tipo de dato.",use:"Se usa para evitar duplicar código cuando solo cambia el tipo de dato.",ex:"template <typename T>\nT max(T a, T b){ return a>b?a:b; }"},
+    {w:"try",cat:"manejo de errores",def:"Marca un bloque de código que podría fallar.",use:"Se usa para manejar errores sin que el programa se detenga.",ex:"try { } catch (exception &e) { }"},
+    {w:"catch",cat:"manejo de errores",def:"Captura y maneja un error ocurrido dentro de un bloque try.",use:"Se usa para responder ante un fallo de forma controlada.",ex:"catch (exception &e) { cout << e.what(); }"},
+    {w:"throw",cat:"manejo de errores",def:"Lanza un error manualmente en el código.",use:"Se usa para señalar de forma explícita que algo salió mal.",ex:"throw runtime_error('Falló');"},
+    {w:"const",cat:"modificador",def:"Indica que un valor no puede modificarse después de asignarse.",use:"Se usa para constantes y para garantizar que un método no modifique el objeto.",ex:"const double PI = 3.1416;"},
+    {w:"auto",cat:"declaración de tipo",def:"Permite que el compilador deduzca automáticamente el tipo de una variable.",use:"Se usa para simplificar declaraciones con tipos largos o complejos.",ex:"auto x = 5; // int"},
+    {w:"nullptr",cat:"valor especial",def:"Representa un puntero que no apunta a ninguna dirección de memoria válida.",use:"Se usa para inicializar o comprobar punteros vacíos de forma segura.",ex:"int* p = nullptr;"},
+    {w:"referencia (&)",cat:"tipo de dato",def:"Un alias de otra variable existente: al modificarla, se modifica la original.",use:"Se usa para pasar variables a funciones sin copiarlas.",ex:"void inc(int &n){ n++; }"},
+    {w:"constexpr",cat:"modificador",def:"Indica que el valor puede calcularse en tiempo de compilación, no de ejecución.",use:"Se usa para mejorar el rendimiento con cálculos que no cambian.",ex:"constexpr int cuadrado(int n){ return n*n; }"},
+    {w:"vector<T>",cat:"estructura de datos",def:"Un arreglo dinámico de la biblioteca estándar que crece o se reduce automáticamente.",use:"Se usa como reemplazo moderno y seguro de los arreglos de tamaño fijo.",ex:"vector<int> nums = {1,2,3};"},
+    {w:"string",cat:"tipo de dato",def:"Representa una cadena de texto de la biblioteca estándar.",use:"Se usa para almacenar y manipular texto de forma segura.",ex:"string nombre = 'Ana';"},
+    {w:"bool",cat:"tipo de dato",def:"Representa un valor lógico: true o false.",use:"Se usa en condiciones y comparaciones.",ex:"bool activo = true;"},
+    {w:"if / else / for / while",cat:"control de flujo",def:"Estructuras heredadas de C: condicionales y ciclos para controlar el flujo del programa.",use:"Se usan igual que en C, para tomar decisiones y repetir bloques.",ex:"for (int i=0;i<3;i++){ cout << i; }"},
+    {w:"static",cat:"modificador",def:"Dentro de una clase, hace que un atributo o método pertenezca a la clase y no a cada objeto.",use:"Se usa para datos compartidos entre todos los objetos de una clase.",ex:"static int total;"},
+    {w:"friend",cat:"modificador",def:"Permite que una función o clase externa acceda a los miembros privados de otra clase.",use:"Se usa cuando dos clases necesitan colaborar muy de cerca.",ex:"friend void mostrar(Persona p);"},
+    {w:"operator (sobrecarga)",cat:"programación orientada a objetos",def:"Permite redefinir el comportamiento de operadores (+, ==, etc.) para objetos propios.",use:"Se usa para que operaciones como sumar dos objetos se vean naturales.",ex:"Punto operator+(Punto p){ return Punto(x+p.x, y+p.y); }"},
+    {w:"main()",cat:"función especial",def:"Es la función por donde comienza a ejecutarse cualquier programa en C++.",use:"Todo programa en C++ necesita esta función.",ex:"int main() {\n    return 0;\n}"},
+    {w:"std::",cat:"espacio de nombres",def:"Prefijo que indica que un elemento pertenece al espacio de nombres estándar de C++.",use:"Se usa antes de cout, string, vector, etc. cuando no se usa 'using namespace std'.",ex:"std::cout << 'Hola';"},
+    {w:"array<T,N>",cat:"estructura de datos (STL)",def:"Un arreglo de tamaño fijo de la biblioteca estándar, más seguro que los arreglos crudos de C.",use:"Se usa cuando se conoce el tamaño exacto de antemano y se quiere seguridad adicional.",ex:"std::array<int,3> nums = {1,2,3};"},
+    {w:"map<K,V>",cat:"estructura de datos (STL)",def:"Una colección ordenada de pares clave-valor.",use:"Se usa para buscar valores rápidamente a partir de una clave, manteniendo orden.",ex:"map<string,int> edades;\nedades['Ana'] = 20;"},
+    {w:"set<T>",cat:"estructura de datos (STL)",def:"Una colección ordenada de elementos únicos, sin duplicados.",use:"Se usa cuando se necesita mantener valores únicos y ordenados.",ex:"set<int> numeros = {3,1,2};"},
+    {w:"pair<T1,T2>",cat:"estructura de datos (STL)",def:"Agrupa dos valores, posiblemente de tipos distintos, en un solo objeto.",use:"Se usa para devolver o almacenar dos valores relacionados juntos.",ex:"pair<string,int> p = {'Ana', 20};"},
+    {w:"queue<T>",cat:"estructura de datos (STL)",def:"Una colección que sigue el principio FIFO (primero en entrar, primero en salir).",use:"Se usa para procesar elementos en el orden en que llegaron.",ex:"queue<int> q;\nq.push(1);"},
+    {w:"stack<T>",cat:"estructura de datos (STL)",def:"Una colección que sigue el principio LIFO (último en entrar, primero en salir).",use:"Se usa para deshacer acciones o evaluar expresiones.",ex:"stack<int> s;\ns.push(1);"},
+    {w:"list<T>",cat:"estructura de datos (STL)",def:"Una lista doblemente enlazada, eficiente para insertar y eliminar en cualquier posición.",use:"Se usa cuando hay muchas inserciones o eliminaciones en medio de la colección.",ex:"list<int> l = {1,2,3};"},
+    {w:"unordered_map<K,V>",cat:"estructura de datos (STL)",def:"Como map, pero sin garantizar orden; a cambio es más rápido en la mayoría de los casos.",use:"Se usa cuando el orden no importa pero sí la velocidad de búsqueda.",ex:"unordered_map<string,int> tabla;"},
+    {w:"iterator",cat:"concepto (STL)",def:"Un objeto que permite recorrer los elementos de un contenedor uno por uno.",use:"Se usa para recorrer vectores, mapas y otras estructuras de la STL.",ex:"vector<int>::iterator it = v.begin();"},
+    {w:"begin() / end()",cat:"método (STL)",def:"Devuelven iteradores al primer elemento y a la posición después del último elemento de un contenedor.",use:"Se usan para recorrer manualmente un contenedor o con ciclos for basados en rango.",ex:"for (auto it = v.begin(); it != v.end(); ++it) { }"},
+    {w:"sort() (algorithm)",cat:"función (STL)",def:"Ordena los elementos de un rango, típicamente un vector completo.",use:"Se usa para ordenar colecciones sin escribir el algoritmo manualmente.",ex:"sort(v.begin(), v.end());"},
+    {w:"find() (algorithm)",cat:"función (STL)",def:"Busca un valor dentro de un rango y devuelve un iterador a su posición.",use:"Se usa para localizar un elemento dentro de un contenedor.",ex:"find(v.begin(), v.end(), 5);"},
+    {w:"lambda ([](){})",cat:"sintaxis",def:"Una función anónima que puede definirse directamente donde se necesita.",use:"Se usa en algoritmos de la STL, como parámetro para sort o for_each.",ex:"sort(v.begin(), v.end(), [](int a, int b){ return a > b; });"},
+    {w:"captura de lambda ([&], [=])",cat:"sintaxis",def:"Define cómo una lambda accede a las variables externas: [&] por referencia, [=] por copia.",use:"Se usa para controlar si la lambda puede modificar variables externas o solo leerlas.",ex:"int total = 0;\nauto sumar = [&total](int n){ total += n; };"},
+    {w:"unique_ptr<T>",cat:"puntero inteligente",def:"Un puntero que gestiona automáticamente la memoria de un objeto, liberándola cuando ya no se usa, sin permitir copias.",use:"Se usa para evitar fugas de memoria sin tener que llamar delete manualmente.",ex:"unique_ptr<int> p = make_unique<int>(5);"},
+    {w:"shared_ptr<T>",cat:"puntero inteligente",def:"Un puntero inteligente que permite que varios punteros compartan la propiedad del mismo objeto, contando referencias.",use:"Se usa cuando varios lugares del código necesitan acceder al mismo objeto en memoria.",ex:"shared_ptr<int> p = make_shared<int>(5);"},
+    {w:"weak_ptr<T>",cat:"puntero inteligente",def:"Un puntero que referencia un objeto gestionado por shared_ptr sin afectar su conteo de referencias.",use:"Se usa para evitar referencias circulares entre objetos.",ex:"weak_ptr<int> wp = sharedPtr;"},
+    {w:"RAII",cat:"concepto",def:"Un principio de C++ donde la adquisición de un recurso se liga a la vida de un objeto, liberándolo automáticamente al destruirse.",use:"Se usa como base de los punteros inteligentes y el manejo seguro de recursos.",ex:"{\n    unique_ptr<int> p = make_unique<int>(5);\n} // se libera automáticamente aquí"},
+    {w:"herencia múltiple",cat:"herencia",def:"Permite que una clase herede de más de una clase base al mismo tiempo.",use:"Se usa con cuidado, ya que puede generar ambigüedades entre las clases base.",ex:"class C : public A, public B { };"},
+    {w:"destructor virtual",cat:"herencia",def:"Un destructor marcado como virtual, que garantiza que se llame el destructor correcto al eliminar un objeto por un puntero a su clase base.",use:"Se usa siempre que una clase tenga métodos virtuales y vaya a heredarse.",ex:"virtual ~Animal() { }"},
+    {w:"función virtual pura (=0)",cat:"herencia",def:"Un método virtual sin implementación, que obliga a las clases hijas a definirlo.",use:"Se usa para crear clases abstractas que sirven solo como plantilla.",ex:"virtual void sonido() = 0;"},
+    {w:"constructor de copia",cat:"programación orientada a objetos",def:"Un constructor especial que crea un nuevo objeto copiando los valores de otro ya existente.",use:"Se usa (o se sobrescribe) cuando copiar un objeto requiere lógica especial, como con punteros.",ex:"Persona(const Persona &otra) { nombre = otra.nombre; }"},
+    {w:"constructor de movimiento",cat:"programación orientada a objetos",def:"Un constructor que transfiere los recursos de un objeto temporal a uno nuevo, en vez de copiarlos.",use:"Se usa para mejorar el rendimiento evitando copias innecesarias.",ex:"Persona(Persona &&otra) noexcept { }"},
+    {w:"std::move()",cat:"función",def:"Convierte un objeto en una referencia rvalue, habilitando la semántica de movimiento en vez de copia.",use:"Se usa para transferir recursos de forma eficiente entre objetos.",ex:"vector<int> b = std::move(a);"},
+    {w:"referencia rvalue (&&)",cat:"tipo de dato",def:"Un tipo de referencia que se enlaza a valores temporales, usada para implementar movimiento en vez de copia.",use:"Se usa en constructores y operadores de movimiento para optimizar el rendimiento.",ex:"void f(int&& x) { }"},
+    {w:"lista de inicialización ({})",cat:"sintaxis",def:"Permite inicializar variables, arreglos u objetos con una lista de valores entre llaves.",use:"Se usa como forma moderna y uniforme de inicializar datos.",ex:"vector<int> v{1,2,3};"},
+    {w:"parámetros por defecto",cat:"sintaxis",def:"Permiten definir un valor que se usará automáticamente si no se pasa un argumento para ese parámetro.",use:"Se usa para hacer funciones más flexibles sin necesidad de sobrecargarlas.",ex:"void saludar(string nombre = 'Invitado') { }"},
+    {w:"sobrecarga de funciones",cat:"programación orientada a objetos",def:"Definir varias funciones con el mismo nombre pero distintos parámetros.",use:"Se usa para ofrecer varias formas de llamar a una acción similar.",ex:"int sumar(int a, int b);\ndouble sumar(double a, double b);"},
+    {w:"static_cast",cat:"conversión de tipos",def:"Convierte de forma segura entre tipos relacionados, verificado en tiempo de compilación.",use:"Se usa para conversiones normales y explícitas, como int a double.",ex:"double d = static_cast<double>(5);"},
+    {w:"dynamic_cast",cat:"conversión de tipos",def:"Convierte de forma segura entre tipos dentro de una jerarquía de herencia con clases polimórficas.",use:"Se usa para convertir un puntero de clase base a una clase derivada de forma verificada.",ex:"Gato* g = dynamic_cast<Gato*>(animal);"},
+    {w:"const_cast",cat:"conversión de tipos",def:"Permite agregar o quitar el calificador const de una variable.",use:"Se usa en casos muy específicos donde se necesita modificar algo declarado como const.",ex:"const_cast<int&>(valorConst) = 10;"},
+    {w:"reinterpret_cast",cat:"conversión de tipos",def:"Reinterpreta el patrón de bits de un tipo como si fuera otro tipo completamente distinto.",use:"Se usa en programación de muy bajo nivel; puede ser peligroso si se usa mal.",ex:"int* p = reinterpret_cast<int*>(direccion);"},
+    {w:"std::exception",cat:"manejo de errores",def:"La clase base de la que heredan la mayoría de las excepciones estándar de C++.",use:"Se usa para capturar errores generales o crear excepciones personalizadas.",ex:"class MiError : public std::exception { };"},
+    {w:"noexcept",cat:"modificador",def:"Indica que una función promete no lanzar excepciones.",use:"Se usa para ayudar al compilador a optimizar y comunicar intención clara.",ex:"void metodo() noexcept { }"},
+    {w:"explicit",cat:"modificador",def:"Evita que un constructor de un solo parámetro se use para conversiones implícitas de tipo.",use:"Se usa para prevenir conversiones automáticas no deseadas entre tipos.",ex:"explicit Persona(int edad) { }"},
+    {w:"enum class",cat:"tipo de dato",def:"Una versión de enum con alcance propio, evitando que sus valores choquen con otros nombres.",use:"Se usa en vez de enum tradicional por ser más seguro en cuanto a tipos.",ex:"enum class Color { ROJO, AZUL };"},
+    {w:"using (alias de tipo)",cat:"declaración",def:"Crea un nombre alternativo para un tipo, similar a typedef pero con sintaxis más moderna.",use:"Se usa para simplificar tipos largos o complejos.",ex:"using Entero = int;"},
+    {w:"#pragma once",cat:"directiva de preprocesador",def:"Evita que un archivo de cabecera se incluya más de una vez, como alternativa moderna a los guardas #ifndef.",use:"Se usa al inicio de archivos .h para prevenir inclusiones duplicadas.",ex:"#pragma once"},
+    {w:"declaración vs definición",cat:"concepto",def:"La declaración anuncia que algo existe (en un .h); la definición da su implementación completa (en un .cpp).",use:"Se usa para separar la interfaz pública de un módulo de sus detalles internos.",ex:"// .h: void saludar();\n// .cpp: void saludar(){ cout<<'Hola'; }"},
+    {w:"std::string métodos (length, substr, find)",cat:"método",def:"length() da el tamaño de la cadena, substr() extrae una parte, find() busca una subcadena.",use:"Se usan constantemente para manipular texto.",ex:"string s = 'Hola';\ns.length(); // 4"},
+    {w:"to_string()",cat:"función",def:"Convierte un número en una cadena de texto.",use:"Se usa para concatenar números con texto fácilmente.",ex:"string s = to_string(25);"},
+    {w:"stoi()",cat:"función",def:"Convierte una cadena de texto en un número entero.",use:"Se usa para transformar texto leído en un número usable.",ex:"int n = stoi('25');"},
+    {w:"ciclo for basado en rango",cat:"control de flujo",def:"Una forma de for que recorre directamente los elementos de un contenedor, sin manejar índices.",use:"Se usa para recorrer vectores, arreglos y otros contenedores de forma más legible.",ex:"for (auto x : vector<int>{1,2,3}) { cout << x; }"},
+    {w:"bindings estructurados",cat:"sintaxis (C++17)",def:"Permiten descomponer un pair, tuple o struct en variables individuales en una sola línea.",use:"Se usa para trabajar cómodamente con funciones que devuelven varios valores.",ex:"auto [nombre, edad] = obtenerDatos();"},
+    {w:"std::function",cat:"tipo de dato",def:"Un tipo que puede almacenar cualquier cosa invocable: funciones normales, lambdas o functores.",use:"Se usa para guardar comportamiento (código) como si fuera un dato, similar a un callback.",ex:"std::function<int(int)> doble = [](int n){ return n*2; };"},
+    {w:"assert()",cat:"función",def:"Comprueba que una condición sea verdadera; si no lo es, detiene el programa durante depuración.",use:"Se usa para verificar suposiciones durante el desarrollo.",ex:"assert(edad > 0);"},
+    {w:"especialización de plantillas",cat:"programación genérica",def:"Permite definir una versión distinta de una plantilla para un tipo de dato concreto.",use:"Se usa cuando el comportamiento genérico no funciona bien para un tipo específico.",ex:"template <> void imprimir<bool>(bool b) { cout << (b?'sí':'no'); }"},
+    {w:"plantillas variádicas",cat:"programación genérica",def:"Plantillas que aceptan un número variable de parámetros de tipo.",use:"Se usa para funciones que trabajan con una cantidad flexible de argumentos de distintos tipos.",ex:"template <typename... Args>\nvoid imprimir(Args... args) { }"},
+    {w:"constexpr if (C++17)",cat:"control de flujo (plantillas)",def:"Un if evaluado en tiempo de compilación, útil dentro de plantillas para elegir código según el tipo.",use:"Se usa para escribir plantillas más simples sin necesidad de especializaciones separadas.",ex:"if constexpr (std::is_integral<T>::value) { }"},
+    {w:"herencia protegida y privada",cat:"herencia",def:"Además de public, una clase puede heredar de forma protected o private, cambiando la visibilidad de los miembros heredados.",use:"Se usa en casos específicos donde no se quiere exponer toda la interfaz de la clase base.",ex:"class B : private A { };"},
+    {w:"miembro estático (static)",cat:"modificador",def:"Un atributo compartido por todos los objetos de una clase, en vez de tener una copia por objeto.",use:"Se usa para contadores globales o configuraciones compartidas entre instancias.",ex:"class Contador {\npublic:\n    static int total;\n};"},
+    {w:"typeid",cat:"operador",def:"Obtiene información sobre el tipo de un objeto en tiempo de ejecución.",use:"Se usa junto con RTTI (información de tipo en tiempo de ejecución) para identificar tipos dinámicamente.",ex:"cout << typeid(objeto).name();"},
+    {w:"amigos de clase (friend class)",cat:"modificador",def:"Permite que una clase completa tenga acceso a los miembros privados de otra.",use:"Se usa cuando dos clases están muy relacionadas y necesitan colaborar estrechamente.",ex:"friend class Motor;"},
+    {w:"delegación de constructores",cat:"programación orientada a objetos",def:"Permite que un constructor llame a otro constructor de la misma clase para reutilizar su lógica.",use:"Se usa para evitar repetir código de inicialización entre varios constructores.",ex:"Persona() : Persona('Sin nombre') { }"},
+    {w:"operador de flujo (<< y >>)",cat:"operador",def:"<< inserta datos en un flujo de salida (como cout); >> extrae datos de un flujo de entrada (como cin).",use:"Se usan constantemente para mostrar y leer información en consola.",ex:"cout << 'Valor: ' << x;"},
+    {w:"const en métodos",cat:"modificador",def:"Marca un método indicando que no modificará el estado del objeto sobre el que se llama.",use:"Se usa para permitir que ese método se llame también sobre objetos const.",ex:"int getEdad() const { return edad; }"},
+    {w:"comentarios (// y /* */)",cat:"sintaxis",def:"Texto que el compilador ignora, usado para explicar el código.",use:"Se usa para documentar qué hace una parte del programa.",ex:"// Esto es un comentario"}
+  ]},
+
+  kotlin: { name:"Kotlin", color:"#9c3f6e", words:[
+    {w:"fun",cat:"declaración",def:"Declara una función: un bloque de código reutilizable que puede recibir parámetros y devolver un valor.",use:"Se usa para organizar el código en piezas reutilizables.",ex:"fun saludar(nombre: String): String {\n    return 'Hola, $nombre'\n}"},
+    {w:"val",cat:"declaración de variable",def:"Declara una variable de solo lectura: su valor no puede reasignarse una vez definido.",use:"Se usa para valores que no deben cambiar, la opción recomendada por defecto.",ex:"val PI = 3.1416"},
+    {w:"var",cat:"declaración de variable",def:"Declara una variable cuyo valor puede reasignarse después.",use:"Se usa solo cuando realmente se necesita que el valor cambie.",ex:"var contador = 0\ncontador++"},
+    {w:"if / else",cat:"control de flujo",def:"Ejecuta un bloque si una condición es verdadera, y otro si es falsa; en Kotlin también puede usarse como expresión que devuelve un valor.",use:"Sirve para tomar decisiones dentro del programa.",ex:"val resultado = if (edad >= 18) 'Mayor' else 'Menor'"},
+    {w:"when",cat:"control de flujo",def:"Compara un valor contra varias opciones posibles, similar a switch en otros lenguajes pero más flexible.",use:"Se usa como alternativa más clara y potente a muchos if/else encadenados.",ex:"when (dia) {\n    1 -> println('Lunes')\n    else -> println('Otro')\n}"},
+    {w:"for",cat:"control de flujo",def:"Recorre los elementos de una colección o un rango de valores.",use:"Se usa para repetir una acción por cada elemento de una lista o rango.",ex:"for (i in 1..3) {\n    println(i)\n}"},
+    {w:"while",cat:"control de flujo",def:"Repite un bloque de código mientras una condición se cumpla.",use:"Se usa cuando no se sabe de antemano cuántas repeticiones habrá.",ex:"var n = 0\nwhile (n < 3) {\n    n++\n}"},
+    {w:"class",cat:"programación orientada a objetos",def:"Define una plantilla para crear objetos con propiedades y métodos comunes.",use:"Se usa para modelar entidades del mundo real.",ex:"class Perro(val nombre: String)"},
+    {w:"data class",cat:"programación orientada a objetos",def:"Una clase pensada para guardar datos, que genera automáticamente métodos útiles como comparación e impresión.",use:"Se usa para modelos de datos simples, como un Usuario o un Producto.",ex:"data class Usuario(val nombre: String, val edad: Int)"},
+    {w:"object",cat:"programación orientada a objetos",def:"Declara una clase con una única instancia automática (singleton).",use:"Se usa cuando solo debe existir un objeto de ese tipo en todo el programa.",ex:"object Configuracion {\n    val version = '1.0'\n}"},
+    {w:"companion object",cat:"programación orientada a objetos",def:"Permite definir miembros que pertenecen a la clase en sí, similar a static en Java.",use:"Se usa para funciones de fábrica o constantes asociadas a una clase.",ex:"class Util {\n    companion object {\n        fun sumar(a: Int, b: Int) = a + b\n    }\n}"},
+    {w:"interface",cat:"programación orientada a objetos",def:"Define un conjunto de métodos que una clase se compromete a implementar.",use:"Se usa para garantizar que distintas clases compartan un comportamiento esperado.",ex:"interface Animal {\n    fun sonido()\n}"},
+    {w:"override",cat:"herencia",def:"Indica que un método está redefiniendo uno heredado de una clase o interfaz.",use:"Se usa para personalizar comportamiento heredado.",ex:"override fun sonido() { println('Miau') }"},
+    {w:"this",cat:"palabra especial",def:"Hace referencia al objeto actual dentro de sus propios métodos.",use:"Se usa para acceder a las propiedades del propio objeto.",ex:"this.nombre = nombre"},
+    {w:"null",cat:"valor especial",def:"Representa la ausencia de valor.",use:"Se usa para indicar que una variable no tiene un valor asignado.",ex:"var nombre: String? = null"},
+    {w:"? (tipo anulable)",cat:"seguridad ante nulos",def:"Al agregarse a un tipo, indica que la variable puede contener null además de su tipo normal.",use:"Se usa para declarar explícitamente cuándo un valor puede faltar.",ex:"var nombre: String? = null"},
+    {w:"?. (llamada segura)",cat:"seguridad ante nulos",def:"Accede a una propiedad o método solo si el valor no es null; si lo es, devuelve null sin lanzar error.",use:"Se usa para evitar errores al trabajar con variables que podrían ser null.",ex:"println(usuario?.nombre)"},
+    {w:"?: (operador Elvis)",cat:"seguridad ante nulos",def:"Devuelve un valor alternativo cuando la expresión de la izquierda resulta null.",use:"Se usa para asignar valores por defecto de forma segura.",ex:"val nombre = entrada ?: 'Invitado'"},
+    {w:"!! (aserción no nula)",cat:"seguridad ante nulos",def:"Fuerza a tratar un valor anulable como si nunca fuera null; si lo es, el programa falla con error.",use:"Se usa solo cuando se está absolutamente seguro de que el valor no es null.",ex:"val nombre = entrada!!"},
+    {w:"lateinit",cat:"declaración de variable",def:"Permite declarar una propiedad var sin inicializarla de inmediato, prometiendo hacerlo antes de usarla.",use:"Se usa cuando el valor inicial se conocerá más adelante, como en vistas de Android.",ex:"lateinit var nombre: String"},
+    {w:"try / catch / finally",cat:"manejo de errores",def:"Permiten ejecutar código riesgoso, capturar el error y ejecutar algo siempre al final.",use:"Se usa para manejar errores sin que el programa se detenga.",ex:"try {\n    riesgo()\n} catch (e: Exception) {\n    println(e.message)\n}"},
+    {w:"throw",cat:"manejo de errores",def:"Lanza un error manualmente en el código.",use:"Se usa para señalar explícitamente que algo salió mal.",ex:"throw IllegalArgumentException('Inválido')"},
+    {w:"import",cat:"módulos",def:"Trae clases o funciones de otros paquetes al archivo actual.",use:"Se usa para reutilizar código entre distintos archivos.",ex:"import kotlin.math.sqrt"},
+    {w:"package",cat:"módulos",def:"Agrupa archivos relacionados bajo un mismo espacio de nombres.",use:"Se usa para organizar el código de un proyecto grande.",ex:"package mx.blitz.app"},
+    {w:"is",cat:"operador",def:"Comprueba si un valor es de un tipo determinado.",use:"Se usa antes de tratar una variable como un tipo más específico.",ex:"if (animal is Gato) { }"},
+    {w:"as",cat:"operador",def:"Convierte (castea) un valor a un tipo específico.",use:"Se usa cuando se necesita tratar un valor como otro tipo compatible.",ex:"val gato = animal as Gato"},
+    {w:"Int / String / Boolean / Double",cat:"tipos de dato",def:"Tipos básicos: Int (entero), String (texto), Boolean (verdadero/falso), Double (decimal).",use:"Se usan para declarar qué tipo de dato guardará una variable.",ex:"val edad: Int = 20"},
+    {w:"List / MutableList",cat:"estructura de datos",def:"List es una lista de solo lectura; MutableList permite agregar o quitar elementos.",use:"Se usan para guardar colecciones ordenadas de valores.",ex:"val nombres: MutableList<String> = mutableListOf('Ana')"},
+    {w:"Map",cat:"estructura de datos",def:"Una colección de pares clave-valor.",use:"Se usa para buscar valores rápidamente a partir de una clave.",ex:"val edades = mapOf('Ana' to 20)"},
+    {w:"lambda { }",cat:"sintaxis",def:"Una función anónima que puede pasarse como valor a otra función.",use:"Se usa para funciones cortas que se pasan como argumento, como en callbacks.",ex:"val doble = { n: Int -> n * 2 }"},
+    {w:"it",cat:"palabra especial",def:"Nombre implícito del único parámetro de una lambda cuando no se define uno explícito.",use:"Se usa para escribir lambdas de un solo parámetro de forma más breve.",ex:"lista.filter { it > 2 }"},
+    {w:"suspend",cat:"asincronía (coroutines)",def:"Marca una función como pausable, permitiendo que se ejecute de forma asíncrona con coroutines.",use:"Se usa para operaciones que toman tiempo, como llamadas de red, sin bloquear el hilo principal.",ex:"suspend fun obtenerDatos() { }"},
+    {w:"sealed class",cat:"programación orientada a objetos",def:"Una clase cuyas subclases están todas conocidas y limitadas dentro del mismo archivo.",use:"Se usa para representar un conjunto cerrado de estados o resultados posibles.",ex:"sealed class Resultado {\n    class Exito(val datos: String): Resultado()\n    class Error(val msg: String): Resultado()\n}"},
+    {w:"Unit",cat:"tipo de dato",def:"Es el equivalente a void: indica que una función no devuelve un valor útil.",use:"Se usa como tipo de retorno implícito de funciones que solo ejecutan una acción.",ex:"fun saludar(): Unit {\n    println('Hola')\n}"},
+    {w:"Any",cat:"tipo de dato",def:"Es la clase raíz de la que heredan todos los tipos en Kotlin, similar a Object en Java.",use:"Se usa cuando una variable puede contener cualquier tipo de valor.",ex:"val algo: Any = 5"},
+    {w:"Nothing",cat:"tipo de dato",def:"Representa un valor que nunca existe, usado en funciones que siempre lanzan una excepción o nunca terminan.",use:"Se usa para indicar al compilador que cierto camino del código nunca produce un valor.",ex:"fun error(msg: String): Nothing {\n    throw IllegalStateException(msg)\n}"},
+    {w:"Array<T>",cat:"tipo de dato",def:"Representa un arreglo de tamaño fijo.",use:"Se usa cuando se necesita una colección de tamaño fijo y alto rendimiento.",ex:"val numeros = arrayOf(1,2,3)"},
+    {w:"rangos (1..10)",cat:"sintaxis",def:"Representan una secuencia de valores entre un inicio y un fin.",use:"Se usan en ciclos for y para comprobar si un valor está dentro de un intervalo.",ex:"for (i in 1..5) { println(i) }"},
+    {w:"downTo / step",cat:"sintaxis",def:"downTo crea un rango descendente; step define de cuánto en cuánto avanza el rango.",use:"Se usan para recorrer rangos hacia atrás o con saltos distintos de uno.",ex:"for (i in 10 downTo 1 step 2) { println(i) }"},
+    {w:"in (comprobación de rango)",cat:"operador",def:"Comprueba si un valor está dentro de un rango o una colección.",use:"Se usa para validaciones simples de intervalos.",ex:"if (edad in 18..65) { println('Adulto') }"},
+    {w:"declaraciones por desestructuración",cat:"sintaxis",def:"Permiten extraer varios valores de un objeto (como un Pair) en variables separadas en una sola línea.",use:"Se usa para trabajar cómodamente con funciones que devuelven varios valores.",ex:"val (nombre, edad) = par"},
+    {w:"funciones de extensión",cat:"sintaxis",def:"Permiten agregar nuevas funciones a una clase existente sin modificar su código original.",use:"Se usa para añadir comportamiento útil a clases de bibliotecas externas o del sistema.",ex:"fun String.gritar() = this.uppercase() + '!'"},
+    {w:"funciones de orden superior",cat:"programación funcional",def:"Funciones que reciben otras funciones como parámetro o devuelven una función.",use:"Se usa para escribir código más flexible y reutilizable, como en map o filter.",ex:"fun operar(a: Int, b: Int, f: (Int,Int)->Int) = f(a,b)"},
+    {w:"parámetros con valor por defecto",cat:"sintaxis",def:"Permiten definir un valor que se usa automáticamente si no se pasa un argumento.",use:"Se usa para hacer funciones más flexibles sin necesidad de sobrecargarlas.",ex:"fun saludar(nombre: String = 'Invitado') { }"},
+    {w:"argumentos con nombre",cat:"sintaxis",def:"Permiten pasar argumentos a una función indicando explícitamente el nombre del parámetro.",use:"Se usa para mejorar la claridad al llamar funciones con muchos parámetros.",ex:"crearUsuario(nombre = 'Ana', edad = 20)"},
+    {w:"función infix",cat:"sintaxis",def:"Permite llamar a una función de un solo parámetro sin usar punto ni paréntesis.",use:"Se usa para crear código más legible tipo lenguaje natural.",ex:"infix fun Int.sumar(n: Int) = this + n\n3 sumar 4"},
+    {w:"enum class",cat:"tipo de dato",def:"Define un tipo con un conjunto fijo de valores posibles.",use:"Se usa para representar opciones cerradas, como días de la semana o estados.",ex:"enum class Dia { LUNES, MARTES }"},
+    {w:"Pair / Triple",cat:"estructura de datos",def:"Agrupan dos o tres valores respectivamente, posiblemente de tipos distintos.",use:"Se usan para devolver o almacenar varios valores relacionados sin crear una clase.",ex:"val p = Pair('Ana', 20)"},
+    {w:"let",cat:"función de alcance (scope function)",def:"Ejecuta un bloque de código usando el objeto como parámetro (it) y devuelve el resultado del bloque.",use:"Se usa comúnmente para operar sobre un valor que podría ser null de forma segura.",ex:"nombre?.let { println(it) }"},
+    {w:"apply",cat:"función de alcance (scope function)",def:"Ejecuta un bloque de configuración sobre un objeto y devuelve ese mismo objeto.",use:"Se usa para inicializar o configurar un objeto justo al crearlo.",ex:"val persona = Persona().apply { nombre = 'Ana' }"},
+    {w:"also",cat:"función de alcance (scope function)",def:"Ejecuta una acción adicional sobre un objeto (como imprimir o loguear) y devuelve ese mismo objeto.",use:"Se usa para efectos secundarios sin interrumpir una cadena de llamadas.",ex:"val n = obtenerNumero().also { println('Valor: $it') }"},
+    {w:"run",cat:"función de alcance (scope function)",def:"Ejecuta un bloque de código y devuelve el resultado de ese bloque, usando el objeto como receptor.",use:"Se usa para agrupar varias operaciones y quedarse con un resultado final.",ex:"val resultado = persona.run { '$nombre tiene $edad años' }"},
+    {w:"with",cat:"función de alcance (scope function)",def:"Ejecuta un bloque de código en el contexto de un objeto, sin necesidad de repetir su nombre.",use:"Se usa para agrupar varias llamadas al mismo objeto de forma más limpia.",ex:"with(persona) { println(nombre) }"},
+    {w:"init",cat:"bloque de inicialización",def:"Un bloque que se ejecuta como parte del constructor principal de una clase.",use:"Se usa para lógica de inicialización adicional que no cabe en la declaración de propiedades.",ex:"class Persona(val nombre: String) {\n    init { println('Creado: $nombre') }\n}"},
+    {w:"constructor secundario",cat:"programación orientada a objetos",def:"Un constructor adicional definido dentro del cuerpo de la clase, además del constructor principal.",use:"Se usa cuando se necesitan varias formas de crear un objeto.",ex:"class Persona(val nombre: String) {\n    constructor() : this('Sin nombre')\n}"},
+    {w:"abstract class",cat:"programación orientada a objetos",def:"Una clase que no puede instanciarse directamente y puede tener métodos sin implementación.",use:"Se usa para definir una base común que otras clases deben completar.",ex:"abstract class Figura {\n    abstract fun area(): Double\n}"},
+    {w:"open",cat:"modificador",def:"Permite que una clase o método pueda ser heredado o sobrescrito; por defecto en Kotlin todo es final.",use:"Se usa explícitamente cuando se quiere permitir la herencia.",ex:"open class Animal { open fun sonido() { } }"},
+    {w:"clase interna (inner class)",cat:"programación orientada a objetos",def:"Una clase definida dentro de otra que mantiene una referencia a la instancia externa.",use:"Se usa cuando la clase interna necesita acceder a los datos de la clase que la contiene.",ex:"class Externa {\n    inner class Interna\n}"},
+    {w:"by (delegación)",cat:"sintaxis",def:"Permite que una clase o propiedad delegue su implementación a otro objeto.",use:"Se usa para reutilizar comportamiento sin herencia, como con lazy o interfaces.",ex:"val nombre: String by lazy { calcularNombre() }"},
+    {w:"lazy",cat:"delegado de propiedad",def:"Retrasa el cálculo del valor de una propiedad hasta que se usa por primera vez.",use:"Se usa para inicializaciones costosas que no siempre se necesitan de inmediato.",ex:"val datos by lazy { cargarDatos() }"},
+    {w:"typealias",cat:"declaración",def:"Crea un nombre alternativo para un tipo existente, especialmente útil con tipos complejos.",use:"Se usa para simplificar la lectura de tipos largos o genéricos.",ex:"typealias Callback = (Int) -> Unit"},
+    {w:"vararg",cat:"sintaxis",def:"Permite que una función reciba una cantidad variable de argumentos del mismo tipo.",use:"Se usa cuando no se sabe de antemano cuántos argumentos recibirá la función.",ex:"fun sumar(vararg nums: Int) = nums.sum()"},
+    {w:"tailrec",cat:"modificador",def:"Optimiza una función recursiva para que no consuma memoria adicional en cada llamada.",use:"Se usa en funciones recursivas que terminan con la llamada recursiva como última operación.",ex:"tailrec fun factorial(n: Int, acc: Int = 1): Int =\n    if (n <= 1) acc else factorial(n-1, n*acc)"},
+    {w:"inline",cat:"modificador",def:"Sugiere al compilador insertar el código de la función directamente donde se llama.",use:"Se usa frecuentemente con funciones que reciben lambdas, para mejorar el rendimiento.",ex:"inline fun medir(bloque: () -> Unit) { bloque() }"},
+    {w:"reified",cat:"programación genérica",def:"Permite que el tipo genérico de una función inline esté disponible en tiempo de ejecución.",use:"Se usa para comprobar o usar el tipo genérico dentro de funciones inline.",ex:"inline fun <reified T> esDeTipo(valor: Any) = valor is T"},
+    {w:"suspend fun",cat:"asincronía (coroutines)",def:"Marca una función como pausable, permitiendo ejecutarla de forma asíncrona con coroutines.",use:"Se usa para operaciones que toman tiempo, como llamadas de red, sin bloquear el hilo principal.",ex:"suspend fun obtenerDatos(): String { }"},
+    {w:"launch",cat:"asincronía (coroutines)",def:"Inicia una nueva coroutine que se ejecuta en segundo plano sin devolver un resultado directo.",use:"Se usa para lanzar tareas asíncronas como actualizar la interfaz tras una descarga.",ex:"GlobalScope.launch { obtenerDatos() }"},
+    {w:"async / await",cat:"asincronía (coroutines)",def:"async inicia una coroutine que devuelve un resultado futuro; await espera ese resultado.",use:"Se usa cuando se necesita el valor devuelto por una tarea asíncrona.",ex:"val resultado = async { calcular() }.await()"},
+    {w:"Flow",cat:"asincronía (coroutines)",def:"Representa un flujo de valores que se emiten de forma asíncrona a lo largo del tiempo.",use:"Se usa para manejar secuencias de datos que llegan poco a poco, como actualizaciones en vivo.",ex:"flow {\n    emit(1)\n    emit(2)\n}"},
+    {w:"MutableList",cat:"estructura de datos",def:"Una lista cuyo contenido puede modificarse: agregar, quitar o cambiar elementos.",use:"Se usa cuando la colección necesita cambiar durante la ejecución del programa.",ex:"val lista = mutableListOf(1,2,3)\nlista.add(4)"},
+    {w:"MutableMap",cat:"estructura de datos",def:"Un mapa cuyo contenido puede modificarse después de creado.",use:"Se usa cuando se necesitan agregar o quitar pares clave-valor dinámicamente.",ex:"val mapa = mutableMapOf('a' to 1)\nmapa['b'] = 2"},
+    {w:"takeIf / takeUnless",cat:"función de extensión",def:"Devuelven el propio valor si cumple (o no cumple) una condición, o null en caso contrario.",use:"Se usa para filtrar un valor de forma expresiva sin escribir un if completo.",ex:"val positivo = numero.takeIf { it > 0 }"}
+  ]},
+
+  html: { name:"HTML", color:"#a0522d", words:[
+    {w:"<!DOCTYPE html>",cat:"declaración",def:"Indica al navegador que el documento usa el estándar actual de HTML5.",use:"Se coloca siempre como primera línea de cualquier archivo HTML.",ex:"<!DOCTYPE html>\n<html>...</html>"},
+    {w:"<html>",cat:"etiqueta raíz",def:"Es el elemento que contiene todo el contenido de la página.",use:"Envuelve absolutamente todo el documento HTML.",ex:"<html lang='es'>...</html>"},
+    {w:"<head>",cat:"etiqueta estructural",def:"Contiene información sobre el documento que no se muestra directamente, como el título o los estilos.",use:"Se usa para metadatos, enlaces a CSS y el título de la pestaña.",ex:"<head>\n  <title>Mi página</title>\n</head>"},
+    {w:"<body>",cat:"etiqueta estructural",def:"Contiene todo el contenido visible de la página: texto, imágenes, botones, etc.",use:"Todo lo que el usuario ve en pantalla va dentro de esta etiqueta.",ex:"<body>\n  <h1>Hola</h1>\n</body>"},
+    {w:"<div>",cat:"contenedor",def:"Un contenedor genérico de bloque sin significado semántico propio.",use:"Se usa para agrupar elementos y aplicarles estilos o estructura.",ex:"<div class='tarjeta'>Contenido</div>"},
+    {w:"<span>",cat:"contenedor",def:"Un contenedor genérico en línea, sin significado semántico propio.",use:"Se usa para aplicar estilos a una parte pequeña de texto dentro de una línea.",ex:"Hola <span class='resaltado'>mundo</span>"},
+    {w:"<p>",cat:"texto",def:"Define un párrafo de texto.",use:"Se usa para bloques de texto normal.",ex:"<p>Este es un párrafo.</p>"},
+    {w:"<h1> a <h6>",cat:"texto",def:"Definen encabezados de distinto nivel de importancia, siendo h1 el más importante.",use:"Se usan para títulos y subtítulos, en orden jerárquico.",ex:"<h1>Título principal</h1>\n<h2>Subtítulo</h2>"},
+    {w:"<a href>",cat:"enlace",def:"Crea un hipervínculo hacia otra página, sección o recurso.",use:"Se usa para navegar entre páginas o secciones.",ex:"<a href='https://ejemplo.com'>Visitar</a>"},
+    {w:"<img src alt>",cat:"multimedia",def:"Inserta una imagen; src indica la ruta del archivo y alt un texto alternativo descriptivo.",use:"Se usa para mostrar imágenes; alt es importante para accesibilidad.",ex:"<img src='logo.png' alt='Logo de la empresa'>"},
+    {w:"<ul> / <li>",cat:"lista",def:"ul crea una lista sin orden numérico; li define cada elemento de la lista.",use:"Se usa para mostrar listas de elementos, como menús o características.",ex:"<ul>\n  <li>Uno</li>\n  <li>Dos</li>\n</ul>"},
+    {w:"<ol>",cat:"lista",def:"Crea una lista ordenada, numerada automáticamente.",use:"Se usa cuando el orden de los elementos importa, como pasos a seguir.",ex:"<ol>\n  <li>Primero</li>\n  <li>Segundo</li>\n</ol>"},
+    {w:"<table> / <tr> / <td>",cat:"tabla",def:"table define una tabla; tr una fila; td una celda de datos dentro de la fila.",use:"Se usan para mostrar datos organizados en filas y columnas.",ex:"<table>\n  <tr><td>Dato 1</td><td>Dato 2</td></tr>\n</table>"},
+    {w:"<form>",cat:"formulario",def:"Agrupa campos de entrada para recolectar datos del usuario.",use:"Se usa para formularios de contacto, registro, búsqueda, etc.",ex:"<form>\n  <input type='text'>\n</form>"},
+    {w:"<input>",cat:"formulario",def:"Crea un campo de entrada de datos, cuyo comportamiento cambia según el atributo type.",use:"Se usa para recolectar texto, números, correos, casillas de verificación, etc.",ex:"<input type='email' placeholder='Correo'>"},
+    {w:"<button>",cat:"formulario",def:"Crea un botón interactivo que el usuario puede presionar.",use:"Se usa para enviar formularios o disparar acciones con JavaScript.",ex:"<button>Enviar</button>"},
+    {w:"<label>",cat:"formulario",def:"Asocia un texto descriptivo con un campo de formulario.",use:"Se usa para mejorar la accesibilidad y claridad de los formularios.",ex:"<label for='nombre'>Nombre:</label>\n<input id='nombre'>"},
+    {w:"<select> / <option>",cat:"formulario",def:"select crea una lista desplegable; option define cada opción disponible.",use:"Se usa para que el usuario elija una opción entre varias.",ex:"<select>\n  <option>Rojo</option>\n  <option>Azul</option>\n</select>"},
+    {w:"<script>",cat:"scripting",def:"Inserta o enlaza código JavaScript dentro de la página.",use:"Se usa para agregar interactividad y lógica a la página.",ex:"<script src='app.js'><\/script>"},
+    {w:"<link>",cat:"metadatos",def:"Enlaza recursos externos, comúnmente hojas de estilo CSS.",use:"Se usa para conectar un archivo CSS externo a la página.",ex:"<link rel='stylesheet' href='estilos.css'>"},
+    {w:"<meta>",cat:"metadatos",def:"Proporciona información adicional sobre la página, como su codificación o descripción.",use:"Se usa para configuración del navegador y buscadores (SEO).",ex:"<meta charset='UTF-8'>"},
+    {w:"<header> / <footer> / <nav> / <main> / <section> / <article>",cat:"etiquetas semánticas",def:"Etiquetas que describen el propósito de una sección: encabezado, pie, navegación, contenido principal, sección o artículo independiente.",use:"Se usan en vez de div genéricos para dar significado y mejorar accesibilidad y SEO.",ex:"<header>\n  <nav>Menú</nav>\n</header>\n<main>Contenido</main>"},
+    {w:"class",cat:"atributo",def:"Asigna uno o más nombres de clase a un elemento, usados para aplicar estilos CSS o seleccionarlo con JavaScript.",use:"Se usa para reutilizar los mismos estilos en varios elementos.",ex:"<div class='tarjeta destacada'></div>"},
+    {w:"id",cat:"atributo",def:"Asigna un identificador único a un elemento dentro de la página.",use:"Se usa para aplicar un estilo específico o referenciarlo desde JavaScript.",ex:"<div id='encabezado'></div>"},
+    {w:"<br>",cat:"texto",def:"Inserta un salto de línea dentro del contenido.",use:"Se usa para separar líneas de texto sin crear un nuevo párrafo.",ex:"Línea uno<br>Línea dos"},
+    {w:"<strong> / <em>",cat:"texto",def:"strong indica importancia (se muestra en negrita); em indica énfasis (se muestra en cursiva).",use:"Se usan para dar énfasis semántico al texto, no solo estilo visual.",ex:"<strong>Importante</strong> y <em>énfasis</em>"},
+    {w:"<!-- comentario -->",cat:"comentario",def:"Texto que el navegador ignora por completo al mostrar la página.",use:"Se usa para dejar notas o desactivar temporalmente código sin borrarlo.",ex:"<!-- Esto es un comentario -->"},
+    {w:"<video>",cat:"multimedia",def:"Inserta contenido de video reproducible directamente en la página.",use:"Se usa para mostrar videos sin depender de un reproductor externo.",ex:"<video src='clip.mp4' controls></video>"},
+    {w:"<audio>",cat:"multimedia",def:"Inserta contenido de audio reproducible directamente en la página.",use:"Se usa para reproducir música, podcasts o efectos de sonido.",ex:"<audio src='cancion.mp3' controls></audio>"},
+    {w:"<iframe>",cat:"contenido incrustado",def:"Incrusta otra página web completa dentro de la página actual.",use:"Se usa para mostrar mapas, videos de YouTube u otro contenido externo.",ex:"<iframe src='https://ejemplo.com'></iframe>"},
+    {w:"<textarea>",cat:"formulario",def:"Crea un campo de texto de varias líneas para que el usuario escriba texto largo.",use:"Se usa para comentarios, mensajes o cualquier texto extenso.",ex:"<textarea rows='4'></textarea>"},
+    {w:"<fieldset> / <legend>",cat:"formulario",def:"fieldset agrupa varios campos relacionados de un formulario; legend le da un título a ese grupo.",use:"Se usa para organizar formularios largos en secciones claras.",ex:"<fieldset>\n  <legend>Datos personales</legend>\n</fieldset>"},
+    {w:"<thead> / <tbody> / <tfoot>",cat:"tabla",def:"Dividen una tabla en encabezado, cuerpo y pie, respectivamente.",use:"Se usan para dar estructura semántica y facilitar el estilo de tablas grandes.",ex:"<table>\n  <thead><tr><th>Nombre</th></tr></thead>\n  <tbody><tr><td>Ana</td></tr></tbody>\n</table>"},
+    {w:"<th>",cat:"tabla",def:"Define una celda de encabezado dentro de una tabla, mostrada en negrita por defecto.",use:"Se usa para los títulos de columna o fila en una tabla.",ex:"<tr><th>Nombre</th><th>Edad</th></tr>"},
+    {w:"placeholder",cat:"atributo",def:"Muestra un texto de ejemplo dentro de un campo de formulario que desaparece al escribir.",use:"Se usa para dar una pista de qué se espera en el campo.",ex:"<input placeholder='Escribe tu nombre'>"},
+    {w:"required",cat:"atributo",def:"Obliga a que un campo de formulario se llene antes de poder enviarlo.",use:"Se usa para validar que datos importantes no se queden vacíos.",ex:"<input type='email' required>"},
+    {w:"disabled",cat:"atributo",def:"Desactiva un campo o botón, impidiendo que el usuario interactúe con él.",use:"Se usa para bloquear temporalmente una acción, como un botón mientras carga.",ex:"<button disabled>Enviar</button>"},
+    {w:"value",cat:"atributo",def:"Define el valor inicial o actual de un campo de formulario.",use:"Se usa para precargar datos en un input o definir el valor de un botón.",ex:"<input type='text' value='Nombre por defecto'>"},
+    {w:"<canvas>",cat:"gráficos",def:"Crea un lienzo en blanco donde se puede dibujar gráficos con JavaScript.",use:"Se usa para juegos, gráficos dinámicos o visualizaciones personalizadas.",ex:"<canvas id='lienzo' width='200' height='100'></canvas>"},
+    {w:"<svg>",cat:"gráficos",def:"Define gráficos vectoriales escalables directamente en el HTML.",use:"Se usa para íconos, ilustraciones y gráficos que se ven nítidos a cualquier tamaño.",ex:"<svg width='100' height='100'><circle cx='50' cy='50' r='40'/></svg>"},
+    {w:"<details> / <summary>",cat:"interactividad",def:"Crean un elemento expandible: summary muestra el título visible y details el contenido oculto que se despliega.",use:"Se usa para preguntas frecuentes o contenido opcional sin necesitar JavaScript.",ex:"<details>\n  <summary>Ver más</summary>\n  <p>Contenido oculto</p>\n</details>"},
+    {w:"data-*",cat:"atributo",def:"Permite almacenar datos personalizados en un elemento HTML, accesibles luego desde JavaScript.",use:"Se usa para guardar información extra relacionada con un elemento sin afectar su apariencia.",ex:"<div data-id='42'>Producto</div>"},
+    {w:"target='_blank'",cat:"atributo",def:"Hace que un enlace se abra en una nueva pestaña del navegador.",use:"Se usa para enlaces externos que no deben interrumpir la navegación actual.",ex:"<a href='https://ejemplo.com' target='_blank'>Visitar</a>"},
+    {w:"<noscript>",cat:"scripting",def:"Muestra contenido alternativo cuando el navegador tiene JavaScript deshabilitado.",use:"Se usa para avisar al usuario que ciertas funciones requieren JavaScript.",ex:"<noscript>Activa JavaScript para usar esta página</noscript>"},
+    {w:"<picture> / <source>",cat:"multimedia",def:"Permiten mostrar distintas versiones de una imagen según el tamaño de pantalla o formato soportado.",use:"Se usa para optimizar imágenes en diseño responsivo.",ex:"<picture>\n  <source srcset='grande.jpg' media='(min-width:800px)'>\n  <img src='pequena.jpg'>\n</picture>"},
+    {w:"rel",cat:"atributo",def:"Describe la relación entre el documento actual y el recurso enlazado.",use:"Se usa comúnmente con stylesheet en <link> o noopener en enlaces externos.",ex:"<link rel='icon' href='favicon.png'>"},
+    {w:"<figure> / <figcaption>",cat:"contenido",def:"figure agrupa contenido ilustrativo (como una imagen); figcaption le agrega un pie de foto.",use:"Se usa para mostrar imágenes con su descripción de forma semántica.",ex:"<figure>\n  <img src='foto.jpg'>\n  <figcaption>Descripción</figcaption>\n</figure>"},
+    {w:"<blockquote> / <cite>",cat:"texto",def:"blockquote marca una cita larga de otra fuente; cite indica el origen de esa cita.",use:"Se usa para citar texto de otro autor o fuente de forma semántica.",ex:"<blockquote>Frase citada</blockquote>"},
+    {w:"<code> / <pre>",cat:"texto",def:"code marca texto como código; pre conserva los espacios y saltos de línea tal como se escribieron.",use:"Se usan juntos para mostrar fragmentos de código con formato preservado.",ex:"<pre><code>function saludar() { }</code></pre>"},
+    {w:"meta viewport",cat:"metadatos",def:"Controla cómo se escala la página en dispositivos móviles.",use:"Se usa en todo sitio responsivo para que se vea bien en celulares.",ex:"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"},
+    {w:"<progress>",cat:"formulario",def:"Muestra una barra de progreso de una tarea, como una descarga.",use:"Se usa para dar retroalimentación visual del avance de un proceso.",ex:"<progress value='70' max='100'></progress>"}
+  ]},
+
+  css: { name:"CSS", color:"#2a6f8a", words:[
+    {w:"selector de clase (.clase)",cat:"selector",def:"Selecciona todos los elementos que tienen un atributo class específico.",use:"Se usa para aplicar el mismo estilo a varios elementos reutilizables.",ex:".tarjeta {\n  padding: 16px;\n}"},
+    {w:"selector de id (#id)",cat:"selector",def:"Selecciona el único elemento que tiene ese id específico.",use:"Se usa para estilos únicos de un elemento particular en la página.",ex:"#encabezado {\n  background: #333;\n}"},
+    {w:"selector de elemento",cat:"selector",def:"Selecciona todos los elementos de un tipo determinado, como todos los párrafos.",use:"Se usa para estilos generales aplicados a un tipo de etiqueta.",ex:"p {\n  color: #222;\n}"},
+    {w:"propiedad: valor;",cat:"sintaxis",def:"La unidad básica de CSS: define qué característica visual se modifica y con qué valor.",use:"Cada línea dentro de un selector sigue este formato.",ex:"color: blue;"},
+    {w:"color",cat:"propiedad",def:"Define el color del texto de un elemento.",use:"Se usa para dar color a cualquier contenido textual.",ex:"h1 { color: #7a2e2e; }"},
+    {w:"background-color",cat:"propiedad",def:"Define el color de fondo de un elemento.",use:"Se usa para dar color de fondo a secciones, botones, tarjetas, etc.",ex:"body { background-color: #f6f1e6; }"},
+    {w:"font-size",cat:"propiedad",def:"Define el tamaño del texto.",use:"Se usa para hacer el texto más grande o más pequeño.",ex:"h1 { font-size: 2rem; }"},
+    {w:"font-family",cat:"propiedad",def:"Define la tipografía (fuente) usada para el texto.",use:"Se usa para dar identidad visual al texto de la página.",ex:"body { font-family: 'Arial', sans-serif; }"},
+    {w:"margin",cat:"propiedad",def:"Define el espacio exterior alrededor de un elemento, fuera de su borde.",use:"Se usa para separar elementos entre sí.",ex:".tarjeta { margin: 20px; }"},
+    {w:"padding",cat:"propiedad",def:"Define el espacio interior entre el borde de un elemento y su contenido.",use:"Se usa para dar 'aire' dentro de una caja sin mover elementos vecinos.",ex:".tarjeta { padding: 16px; }"},
+    {w:"border",cat:"propiedad",def:"Define el borde alrededor de un elemento: grosor, estilo y color.",use:"Se usa para delimitar visualmente cajas, tarjetas o botones.",ex:".tarjeta { border: 1px solid #ccc; }"},
+    {w:"width / height",cat:"propiedad",def:"Definen el ancho y el alto de un elemento.",use:"Se usan para controlar el tamaño de cajas, imágenes o contenedores.",ex:".caja { width: 200px; height: 100px; }"},
+    {w:"display",cat:"propiedad",def:"Define cómo se comporta un elemento en el flujo de la página: block, inline, flex, grid, none, etc.",use:"Se usa para controlar el tipo de disposición de un elemento.",ex:".contenedor { display: flex; }"},
+    {w:"position",cat:"propiedad",def:"Define cómo se posiciona un elemento: static (normal), relative, absolute o fixed.",use:"Se usa para colocar elementos con precisión, como menús fijos o superposiciones.",ex:".modal { position: fixed; top: 0; }"},
+    {w:"flex (Flexbox)",cat:"sistema de layout",def:"Un sistema de disposición en una dimensión (fila o columna) que distribuye el espacio entre elementos.",use:"Se usa para alinear y distribuir elementos fácilmente en barras de navegación, tarjetas, etc.",ex:".fila { display: flex; justify-content: space-between; }"},
+    {w:"justify-content",cat:"propiedad (flex)",def:"Alinea los elementos hijos a lo largo del eje principal de un contenedor flex.",use:"Se usa para centrar o distribuir elementos horizontalmente (en fila).",ex:".fila { justify-content: center; }"},
+    {w:"align-items",cat:"propiedad (flex)",def:"Alinea los elementos hijos a lo largo del eje transversal de un contenedor flex.",use:"Se usa para centrar elementos verticalmente dentro de una fila flex.",ex:".fila { align-items: center; }"},
+    {w:"grid (CSS Grid)",cat:"sistema de layout",def:"Un sistema de disposición en dos dimensiones (filas y columnas) para layouts complejos.",use:"Se usa para maquetar páginas completas con estructuras de cuadrícula.",ex:".layout { display: grid; grid-template-columns: 1fr 1fr; }"},
+    {w:":hover",cat:"pseudo-clase",def:"Aplica un estilo cuando el cursor del usuario pasa sobre un elemento.",use:"Se usa para dar retroalimentación visual en botones y enlaces.",ex:"button:hover { background: #ddd; }"},
+    {w:"::before / ::after",cat:"pseudo-elemento",def:"Insertan contenido generado antes o después del contenido real de un elemento.",use:"Se usan para agregar decoraciones o íconos sin modificar el HTML.",ex:".tag::before { content: '#'; }"},
+    {w:"@media",cat:"regla especial",def:"Aplica un bloque de estilos solo cuando se cumple una condición, como el ancho de pantalla.",use:"Se usa para hacer diseños responsivos que se adaptan a móviles y escritorio.",ex:"@media (max-width: 600px) {\n  body { font-size: 14px; }\n}"},
+    {w:"box-sizing",cat:"propiedad",def:"Define si el padding y el borde se incluyen o no dentro del ancho/alto declarado de un elemento.",use:"Se usa con border-box para que el tamaño de las cajas sea más predecible.",ex:"* { box-sizing: border-box; }"},
+    {w:"z-index",cat:"propiedad",def:"Define el orden de apilamiento de elementos superpuestos: los valores más altos quedan encima.",use:"Se usa para controlar qué elemento se ve por encima de otro, como modales.",ex:".modal { z-index: 999; }"},
+    {w:"opacity",cat:"propiedad",def:"Define la transparencia de un elemento, de 0 (invisible) a 1 (totalmente visible).",use:"Se usa para efectos de desvanecido o para elementos deshabilitados.",ex:".deshabilitado { opacity: 0.5; }"},
+    {w:"transition",cat:"propiedad",def:"Anima el cambio de una propiedad CSS de forma suave a lo largo de un tiempo determinado.",use:"Se usa para que los cambios de estilo (como en :hover) se vean fluidos.",ex:"button { transition: background 0.3s; }"},
+    {w:"transform",cat:"propiedad",def:"Aplica transformaciones visuales como rotar, escalar o mover un elemento.",use:"Se usa para efectos visuales y animaciones sin afectar el flujo del documento.",ex:".icono:hover { transform: scale(1.1); }"},
+    {w:"!important",cat:"modificador",def:"Fuerza a que una regla CSS tenga prioridad sobre cualquier otra, sin importar la especificidad normal.",use:"Se usa como último recurso; abusar de él dificulta mantener el CSS.",ex:"p { color: red !important; }"},
+    {w:"variables CSS (--var)",cat:"sintaxis",def:"Permiten definir valores reutilizables que pueden usarse en toda la hoja de estilos.",use:"Se usan para mantener colores, tamaños o espaciados consistentes en todo el sitio.",ex:":root { --azul: #0071e3; }\nh1 { color: var(--azul); }"},
+    {w:"rem / em",cat:"unidad de medida",def:"em es relativo al tamaño de fuente del elemento padre; rem es relativo al tamaño de fuente raíz del documento.",use:"Se usan para tamaños que escalan de forma consistente y accesible.",ex:"h1 { font-size: 2rem; }"},
+    {w:"gap",cat:"propiedad",def:"Define el espacio entre los elementos de un contenedor flex o grid.",use:"Se usa para separar tarjetas, columnas o filas sin usar márgenes individuales.",ex:".fila { display: flex; gap: 12px; }"},
+    {w:"flex-direction",cat:"propiedad (flex)",def:"Define si los elementos de un contenedor flex se acomodan en fila o en columna.",use:"Se usa para cambiar la orientación principal de un layout flex.",ex:".contenedor { flex-direction: column; }"},
+    {w:"flex-wrap",cat:"propiedad (flex)",def:"Define si los elementos de un contenedor flex pueden pasar a una nueva línea cuando no caben.",use:"Se usa para que un diseño flex se adapte a pantallas pequeñas.",ex:".contenedor { flex-wrap: wrap; }"},
+    {w:"flex-grow / flex-shrink / flex-basis",cat:"propiedad (flex)",def:"Controlan cómo crece, se encoge y qué tamaño base tiene un elemento dentro de un contenedor flex.",use:"Se usan para repartir el espacio disponible entre varios elementos de forma proporcional.",ex:".caja { flex-grow: 1; }"},
+    {w:"grid-template-rows",cat:"propiedad (grid)",def:"Define el número y tamaño de las filas de una cuadrícula.",use:"Se usa junto a grid-template-columns para definir la estructura completa de un grid.",ex:".layout { grid-template-rows: 80px auto 60px; }"},
+    {w:"row-gap / column-gap",cat:"propiedad (grid)",def:"Definen el espacio entre filas y entre columnas de una cuadrícula, respectivamente.",use:"Se usan para separar los elementos de un grid sin usar márgenes.",ex:".layout { row-gap: 10px; column-gap: 20px; }"},
+    {w:"grid-column / grid-row",cat:"propiedad (grid)",def:"Definen en qué columnas o filas de la cuadrícula se ubica un elemento específico.",use:"Se usan para que un elemento ocupe varias celdas del grid.",ex:".destacado { grid-column: 1 / 3; }"},
+    {w:"align-content",cat:"propiedad (flex/grid)",def:"Alinea varias líneas de elementos dentro de un contenedor cuando sobra espacio en el eje transversal.",use:"Se usa cuando hay varias filas o columnas y se necesita distribuirlas verticalmente.",ex:".contenedor { align-content: space-between; }"},
+    {w:"text-align",cat:"propiedad",def:"Define la alineación horizontal del texto dentro de su contenedor.",use:"Se usa para centrar, justificar o alinear texto a la izquierda o derecha.",ex:"h1 { text-align: center; }"},
+    {w:"text-decoration",cat:"propiedad",def:"Define decoraciones del texto, como subrayado, tachado o ninguna.",use:"Se usa comúnmente para quitar el subrayado de los enlaces.",ex:"a { text-decoration: none; }"},
+    {w:"line-height",cat:"propiedad",def:"Define la altura de línea del texto, afectando el espacio vertical entre renglones.",use:"Se usa para mejorar la legibilidad de párrafos largos.",ex:"p { line-height: 1.6; }"},
+    {w:"letter-spacing",cat:"propiedad",def:"Define el espacio horizontal entre las letras de un texto.",use:"Se usa para dar estilo a títulos o mejorar la lectura de texto en mayúsculas.",ex:"h1 { letter-spacing: 1px; }"},
+    {w:"white-space",cat:"propiedad",def:"Controla cómo se manejan los espacios en blanco y los saltos de línea dentro de un texto.",use:"Se usa para evitar que el texto se rompa en varias líneas, entre otros casos.",ex:"p { white-space: nowrap; }"},
+    {w:"overflow",cat:"propiedad",def:"Define qué sucede cuando el contenido de un elemento es más grande que su caja: visible, hidden, scroll o auto.",use:"Se usa para controlar el desbordamiento de contenido, como en contenedores con scroll.",ex:".caja { overflow: auto; }"},
+    {w:"cursor",cat:"propiedad",def:"Define qué ícono de cursor se muestra al pasar el mouse sobre un elemento.",use:"Se usa para indicar visualmente que un elemento es interactivo, como pointer en botones.",ex:"button { cursor: pointer; }"},
+    {w:"box-shadow",cat:"propiedad",def:"Agrega una sombra alrededor de un elemento.",use:"Se usa para dar profundidad visual a tarjetas, botones o modales.",ex:".tarjeta { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }"},
+    {w:"border-radius",cat:"propiedad",def:"Redondea las esquinas de un elemento.",use:"Se usa para dar bordes suaves a botones, tarjetas o imágenes.",ex:".boton { border-radius: 8px; }"},
+    {w:"background-image",cat:"propiedad",def:"Define una imagen como fondo de un elemento.",use:"Se usa para fondos decorativos o banners.",ex:".banner { background-image: url('fondo.jpg'); }"},
+    {w:"background-size / background-position",cat:"propiedad",def:"Controlan el tamaño y la posición de una imagen de fondo dentro de su contenedor.",use:"Se usan para que las imágenes de fondo se vean bien cubran el espacio deseado.",ex:".banner { background-size: cover; background-position: center; }"},
+    {w:"linear-gradient()",cat:"función CSS",def:"Crea un degradado de color en línea recta, usado como valor de background.",use:"Se usa para fondos decorativos con transición suave entre colores.",ex:".hero { background: linear-gradient(to right, #7a2e2e, #2e5a4a); }"},
+    {w:"animation / @keyframes",cat:"propiedad y regla",def:"@keyframes define los pasos de una animación; animation la aplica a un elemento.",use:"Se usan para crear animaciones personalizadas, como elementos que aparecen deslizándose.",ex:"@keyframes aparecer { from{opacity:0;} to{opacity:1;} }\n.caja { animation: aparecer 0.5s; }"},
+    {w:"calc()",cat:"función CSS",def:"Permite realizar cálculos matemáticos directamente en un valor CSS, combinando distintas unidades.",use:"Se usa para tamaños dinámicos, como 'todo el ancho menos un margen fijo'.",ex:".caja { width: calc(100% - 40px); }"},
+    {w:"min-width / max-width",cat:"propiedad",def:"Definen el ancho mínimo y máximo que puede tener un elemento.",use:"Se usan para que un elemento no se encoja ni crezca demasiado en distintas pantallas.",ex:".contenedor { max-width: 1200px; }"},
+    {w:"visibility",cat:"propiedad",def:"Controla si un elemento es visible u oculto, pero a diferencia de display:none, sigue ocupando espacio.",use:"Se usa cuando se necesita ocultar algo sin alterar el resto del layout.",ex:".oculto { visibility: hidden; }"},
+    {w:"float",cat:"propiedad",def:"Saca un elemento del flujo normal y lo alinea a la izquierda o derecha, permitiendo que el texto lo rodee.",use:"Técnica antigua de maquetación, hoy reemplazada mayormente por flexbox y grid.",ex:"img { float: left; }"},
+    {w:"content",cat:"propiedad",def:"Define el contenido generado que se inserta con los pseudo-elementos ::before y ::after.",use:"Se usa para agregar íconos, comillas o texto decorativo sin tocar el HTML.",ex:".tag::before { content: '#'; }"},
+    {w:":nth-child()",cat:"pseudo-clase",def:"Selecciona elementos según su posición numérica entre los hijos de su contenedor.",use:"Se usa para dar estilo alterno a filas de una tabla o lista, entre otros casos.",ex:"li:nth-child(2n) { background: #eee; }"},
+    {w:":first-child / :last-child",cat:"pseudo-clase",def:"Seleccionan el primer o el último elemento hijo dentro de su contenedor.",use:"Se usan para dar estilo especial al primer o último elemento de una lista.",ex:"li:first-child { font-weight: bold; }"},
+    {w:":not()",cat:"pseudo-clase",def:"Selecciona todos los elementos que no cumplen con un selector dado.",use:"Se usa para aplicar estilos a todo excepto ciertos elementos específicos.",ex:"p:not(.destacado) { color: gray; }"},
+    {w:"combinadores (> + ~)",cat:"selector",def:"Seleccionan elementos según su relación: > hijo directo, + hermano inmediato, ~ hermanos siguientes.",use:"Se usan para seleccionar elementos según su posición relativa en el HTML.",ex:".menu > li { display: inline-block; }"},
+    {w:"selector de atributo [attr]",cat:"selector",def:"Selecciona elementos que tienen un atributo determinado, opcionalmente con un valor específico.",use:"Se usa para dar estilo según atributos HTML, como el tipo de un input.",ex:"input[type='email'] { border-color: blue; }"},
+    {w:"inherit / initial / unset",cat:"valor especial",def:"inherit toma el valor del elemento padre; initial usa el valor por defecto del navegador; unset combina ambos comportamientos.",use:"Se usan para restablecer o forzar la herencia de una propiedad.",ex:"p { color: inherit; }"},
+    {w:"vh / vw",cat:"unidad de medida",def:"vh y vw son porcentajes del alto y ancho de la ventana del navegador, respectivamente.",use:"Se usan para elementos que deben ocupar una parte fija de la pantalla, como una sección de altura completa.",ex:".hero { height: 100vh; }"},
+    {w:"especificidad",cat:"concepto",def:"Es la regla que determina qué estilo CSS gana cuando varias reglas afectan al mismo elemento.",use:"Se usa para entender por qué un estilo se aplica o no, según cómo se escribió el selector.",ex:"#id { color: red; } /* gana sobre */\n.clase { color: blue; }"}
+  ]}
+};
+
+const langOrder = ["js","py","java","c","cpp","kotlin","html","css"];
+let currentLang = "js";
+
+const tabsEl = document.getElementById('tabs');
+const entriesEl = document.getElementById('entries');
+const searchBox = document.getElementById('searchBox');
+const langTitle = document.getElementById('langTitle');
+const langCount = document.getElementById('langCount');
+
+function buildTabs(){
+  tabsEl.innerHTML = "";
+  langOrder.forEach(key => {
+    const lang = DATA[key];
+    const btn = document.createElement('button');
+    btn.style.setProperty('--lang-color', lang.color);
+    btn.innerHTML = `<span class="dot" style="background:${lang.color}"></span>${lang.name}`;
+    btn.className = key === currentLang ? 'active' : '';
+    btn.addEventListener('click', () => {
+      currentLang = key;
+      searchBox.value = "";
+      buildTabs();
+      renderEntries("");
+    });
+    tabsEl.appendChild(btn);
+  });
+}
+
+function highlight(text, query){
+  if(!query) return text;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if(idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx+query.length) + '</mark>' + text.slice(idx+query.length);
+}
+
+function renderEntries(query){
+  const lang = DATA[currentLang];
+  document.documentElement.style.setProperty('--lang-color', lang.color);
+  langTitle.textContent = lang.name;
+  langTitle.style.color = lang.color;
+
+  const q = query.trim().toLowerCase();
+  const filtered = lang.words.filter(item => {
+    if(!q) return true;
+    return item.w.toLowerCase().includes(q) ||
+           item.def.toLowerCase().includes(q) ||
+           item.cat.toLowerCase().includes(q) ||
+           item.use.toLowerCase().includes(q);
+  });
+
+  langCount.textContent = `${filtered.length} de ${lang.words.length} palabras`;
+
+  entriesEl.innerHTML = "";
+  entriesEl.style.setProperty('--lang-color', lang.color);
+
+  if(filtered.length === 0){
+    entriesEl.innerHTML = `<div class="no-results">No se encontró ninguna palabra que coincida con "${query}" en ${lang.name}.</div>`;
+    return;
+  }
+
+  filtered.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'entry';
+    div.style.setProperty('--lang-color', lang.color);
+    div.innerHTML = `
+      <div class="entry-head">
+        <span class="entry-word">${highlight(item.w, query)}</span>
+        <span class="entry-cat">${item.cat}</span>
+      </div>
+      <p class="entry-def">${highlight(item.def, query)}</p>
+      <p class="entry-use"><strong>Para qué sirve:</strong> ${item.use}</p>
+      <pre class="example">${item.ex.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre>
+    `;
+    entriesEl.appendChild(div);
+  });
+}
+
+searchBox.addEventListener('input', (e) => renderEntries(e.target.value));
+
+buildTabs();
+renderEntries("");
+</script>
+</body>
+</html>
